@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public abstract class TwoButtonInputController : MonoBehaviour
+public abstract class InputController : MonoBehaviour
 {
     public enum InputMode
     {
@@ -10,24 +10,26 @@ public abstract class TwoButtonInputController : MonoBehaviour
         MainMenu
     }
 
-    public struct ModeControls
+    public class ModeControls
     {
         public InputMode TargetMode;
         public event Action Primary;
         public event Action Secondary;
 
-        public ModeControls(InputMode targetMode) : this()
+        public ModeControls(InputMode targetMode)
         {
             TargetMode = targetMode;
         }
 
         public void InvokePrimary()
         {
-            Primary.Invoke();
+            if (Primary != null)
+                Primary.Invoke();
         }
         public void InvokeSecondary()
         {
-            Secondary.Invoke();
+            if (Secondary != null)
+                Secondary.Invoke();
         }
     }
 

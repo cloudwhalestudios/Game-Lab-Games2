@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class StandaloneInputController : TwoButtonInputController
+public class StandaloneInputController : InputController
 {
     void Update()
     {

@@ -14,9 +14,9 @@ public class UserProgress
 
     [SerializeField]
     int[] field = new int[0];
-        
+
     [SerializeField]
-    Vector2Int currentBrick;
+    int currentBrickValue;
     [SerializeField]
     int nextBrick;
 
@@ -54,12 +54,12 @@ public class UserProgress
     {
         get { return topScore; }
     }
-    public Vector2Int CurrentBrick
+    public int CurrentBrickValue
     {
-        get { return currentBrick; }
+        get { return currentBrickValue; }
         set
         {
-            currentBrick = value;
+            currentBrickValue = value;
         }
     }
     public int NextBrick

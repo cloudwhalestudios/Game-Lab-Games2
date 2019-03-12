@@ -25,6 +25,7 @@ public class GameController : MonoBehaviour
     public PlaySfx mergingSfx;
 
     public bool skipLoad;
+    public bool deleteSave;
 
     Brick[,] field;
     Brick[] placement;
@@ -54,14 +55,20 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
-        TwoButtonInputController.ActiveInputMode = TwoButtonInputController.InputMode.Game;
-        TwoButtonInputController.Game.Primary += OnPrimary;
-        TwoButtonInputController.Game.Secondary += OnSecondary;
+        InputController.ActiveInputMode = InputController.InputMode.Game;
+        InputController.Game.Primary += OnPrimaryGame;
+        InputController.Game.Secondary += OnSecondaryGame;
+
+        InputController.Pause.Primary += OnPrimaryPause;
+        InputController.Pause.Secondary += OnSecondaryPause;
 
         SpawnPreviewBrick();
 
         placement = new Brick[bricksCount.x];
         field = new Brick[bricksCount.x, bricksCount.y];
+
+        if (deleteSave)
+            PlayerPrefs.DeleteAll();
 
         if (!skipLoad && LoadGame())
             return;
@@ -74,18 +81,20 @@ public class GameController : MonoBehaviour
 
     void OnDestroy()
     {
-        TwoButtonInputController.Game.Primary -= OnPrimary;
-        TwoButtonInputController.Game.Secondary -= OnSecondary;
+        InputController.Game.Primary -= OnPrimaryGame;
+        InputController.Game.Secondary -= OnSecondaryGame;
+
+        InputController.Pause.Primary -= OnPrimaryPause;
+        InputController.Pause.Secondary -= OnSecondaryPause;
     }
 
-    void OnPrimary()
+    void OnPrimaryGame()
     {
-        // Pause menu
-        PauseButton.OnClick();
-        pauseMenu.SetActive(!pauseMenu.activeInHierarchy);
+        TogglePause();
+        InputController.ActiveInputMode = InputController.InputMode.Pause;
     }
 
-    void OnSecondary()
+    void OnSecondaryGame()
     {
         // Move brick down
         if (isAnimating || isFalling)
@@ -95,6 +104,25 @@ public class GameController : MonoBehaviour
         timeSinceMoveDown = 0f;
         MoveDown();
     }
+
+    void TogglePause()
+    {
+        PauseButton.OnClick();
+        pauseMenu.SetActive(!pauseMenu.activeInHierarchy);
+    }
+    void OnPrimaryPause()
+    {
+        // perform select button action
+
+        InputController.ActiveInputMode = InputController.InputMode.Game;
+        TogglePause();
+    }
+
+    void OnSecondaryPause()
+    {
+        // Exit Game
+    }
+
 
     void Update()
     {
@@ -142,9 +170,9 @@ public class GameController : MonoBehaviour
             }
         }
 
-        currentPosition = UserProgress.Current.CurrentBrick;
+        currentPosition = new Vector2Int(placementStart, 0); // UserProgress.Current.CurrentBrick;
         previewBrick.Number = UserProgress.Current.NextBrick;
-
+        SpawnPlacement(placementStart, UserProgress.Current.CurrentBrickValue);
         return true;
     }
 
@@ -160,7 +188,7 @@ public class GameController : MonoBehaviour
         }
 
         UserProgress.Current.SetField(numbers);
-        UserProgress.Current.CurrentBrick = currentPosition;
+        UserProgress.Current.CurrentBrickValue = currentBrickInstance.Number;
         UserProgress.Current.NextBrick = previewBrick.Number;
         UserProgress.Current.Save();
     }
@@ -218,7 +246,7 @@ public class GameController : MonoBehaviour
         brick.GetComponent<RectTransform>().anchoredPosition
             = GetBrickPosition(new Vector2(coords.x, coords.y));
 
-        field[coords.x, coords.y] = currentBrickInstance;
+        field[coords.x, coords.y] = brick;
     }
 
     private void InstantiateBrick(Vector2Int position, int number)
@@ -226,7 +254,7 @@ public class GameController : MonoBehaviour
         Brick brick = Instantiate(brickPrefab, fieldTransform);
         brick.Number = number;
 
-        Spawn(position);
+        Spawn(position, brick);
     }
 
     void SpawnPreviewBrick()

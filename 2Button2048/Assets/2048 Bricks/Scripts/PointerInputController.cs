@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class PointerInputController : TwoButtonInputController, IPointerDownHandler, IPointerClickHandler, IDragHandler
+public class PointerInputController : InputController, IPointerDownHandler, IPointerClickHandler, IDragHandler
 {
     public float swipeThreshold = 20f;
     public float moveThreshold = 80f;
