@@ -3,23 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 
 
 public class GameController : MonoBehaviour
 {
-    public Vector2Int bricksCount;
+    public Vector2Int bricksCount;      // Move to: Game Option for grid size (experimental: no resacling applied yet)
     public RectTransform fieldTransform;
     public RectTransform placementTransform;
     public RectTransform placementIndicator;
     public int placementStart;
-    public float autoMoveInterval;      // selection speeds
-    public float fallSpeed;             // speed of block placement
+    public float autoMoveInterval;      // Move to: Assistance Option for selection speeds
+    public float fallSpeed;             // Move to: Game Option for falling speed when playing brick
     public Transform nextBrickPoint;
     public Brick brickPrefab;
-
-    public GameObject pauseMenu;
 
     public PlaySfx landingSfx;
     public PlaySfx mergingSfx;
@@ -40,7 +39,13 @@ public class GameController : MonoBehaviour
     bool isAnimating;
     bool isPlaced;
 
-    float elapsedTime = 0;
+    float elapsedTime = 0;              // Move to: Assistance Option Script to keep track of time inbetween intervals
+
+    public GameObject pauseMenu;                // Move to: Menu Handler
+    public List<Button> buttons;                // Move to: Menu Handler
+    public RectTransform menuSelectIndicator;   // Move to: Menu Handler
+    int selectedButtonIndex;                    // Move to: Menu Handler
+    Coroutine menuSelector;                     // Move to: Menu Handler
 
     class BrickPath
     {
@@ -86,12 +91,15 @@ public class GameController : MonoBehaviour
 
         InputController.Pause.Primary -= OnPrimaryPause;
         InputController.Pause.Secondary -= OnSecondaryPause;
+
+        StopAllCoroutines();
     }
 
     void OnPrimaryGame()
     {
         TogglePause();
         InputController.ActiveInputMode = InputController.InputMode.Pause;
+        menuSelector = StartCoroutine(MenuSelection());
     }
 
     void OnSecondaryGame()
@@ -105,17 +113,40 @@ public class GameController : MonoBehaviour
         MoveDown();
     }
 
+    // Move to: Menu Handler
     void TogglePause()
     {
         PauseButton.OnClick();
         pauseMenu.SetActive(!pauseMenu.activeInHierarchy);
     }
+
+    // Move to: Menu Handler
+    IEnumerator MenuSelection()
+    {
+        selectedButtonIndex = 0;
+        while(true)
+        {
+            Debug.Log("Selection " + selectedButtonIndex);
+            IndicateMenuButton(buttons[selectedButtonIndex]);
+            yield return new WaitForSecondsRealtime(autoMoveInterval);
+
+            selectedButtonIndex = (selectedButtonIndex+1) % buttons.Count;
+        }
+    }
+
+    void IndicateMenuButton(Button btn)
+    {
+        var btnRect = btn.GetComponent<RectTransform>();
+        var pos = new Vector2(btnRect.position.x, btnRect.position.y);
+        menuSelectIndicator.anchoredPosition = pos;
+    }
+
     void OnPrimaryPause()
     {
         // perform select button action
-
         InputController.ActiveInputMode = InputController.InputMode.Game;
         TogglePause();
+        StopCoroutine(menuSelector);
     }
 
     void OnSecondaryPause()
