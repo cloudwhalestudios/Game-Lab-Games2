@@ -23,14 +23,12 @@ public class GameController : MonoBehaviour
     public PlaySfx landingSfx;
     public PlaySfx mergingSfx;
 
-    public bool skipLoad;
-    public bool deleteSave;
-
     Brick[,] field;
     Brick[] placement;
     Brick previewBrick;
 
     Vector2Int currentPosition;
+    int lastPlacementPosition;
     Brick currentBrickInstance;
 
     bool isFalling;
@@ -42,9 +40,12 @@ public class GameController : MonoBehaviour
     float elapsedTime = 0;              // Move to: Assistance Option Script to keep track of time inbetween intervals
 
     public GameObject pauseMenu;                // Move to: Menu Handler
-    public List<Button> buttons;                // Move to: Menu Handler
+    public GameObject pauseButtonParent;        // Move to: Menu Handler
     public RectTransform menuSelectIndicator;   // Move to: Menu Handler
+    public int startingIndex;                   // Move to: Menu Handler
+    public bool startPaused;                    // Move to: Menu Handler
     int selectedButtonIndex;                    // Move to: Menu Handler
+    List<Button> buttons;                       // Move to: Menu Handler
     Coroutine menuSelector;                     // Move to: Menu Handler
 
     class BrickPath
@@ -72,16 +73,16 @@ public class GameController : MonoBehaviour
         placement = new Brick[bricksCount.x];
         field = new Brick[bricksCount.x, bricksCount.y];
 
-        if (deleteSave)
-            PlayerPrefs.DeleteAll();
+        if (!LoadGame())
+        {
+            UserProgress.Current.Score = 0;
+            lastPlacementPosition = placementStart;
+            currentPosition = new Vector2Int(lastPlacementPosition, 0);
+            SpawnPlacement(lastPlacementPosition, GetRandomNumber());
+            previewBrick.Number = GetRandomNumber();
+        }
 
-        if (!skipLoad && LoadGame())
-            return;
-
-        UserProgress.Current.Score = 0;
-        currentPosition = new Vector2Int(placementStart, 0);
-        SpawnPlacement(placementStart, GetRandomNumber());
-        previewBrick.Number = GetRandomNumber();
+        SetupPauseMenu();
     }
 
     void OnDestroy()
@@ -97,13 +98,6 @@ public class GameController : MonoBehaviour
 
     void OnPrimaryGame()
     {
-        TogglePause();
-        InputController.ActiveInputMode = InputController.InputMode.Pause;
-        menuSelector = StartCoroutine(MenuSelection());
-    }
-
-    void OnSecondaryGame()
-    {
         // Move brick down
         if (isAnimating || isFalling)
             return;
@@ -113,45 +107,108 @@ public class GameController : MonoBehaviour
         MoveDown();
     }
 
-    // Move to: Menu Handler
-    void TogglePause()
+    void OnSecondaryGame()
     {
-        PauseButton.OnClick();
-        pauseMenu.SetActive(!pauseMenu.activeInHierarchy);
-    }
-
-    // Move to: Menu Handler
-    IEnumerator MenuSelection()
-    {
-        selectedButtonIndex = 0;
-        while(true)
-        {
-            Debug.Log("Selection " + selectedButtonIndex);
-            IndicateMenuButton(buttons[selectedButtonIndex]);
-            yield return new WaitForSecondsRealtime(autoMoveInterval);
-
-            selectedButtonIndex = (selectedButtonIndex+1) % buttons.Count;
-        }
-    }
-
-    void IndicateMenuButton(Button btn)
-    {
-        var btnRect = btn.GetComponent<RectTransform>();
-        var pos = new Vector2(btnRect.position.x, btnRect.position.y);
-        menuSelectIndicator.anchoredPosition = pos;
+        TogglePause();
     }
 
     void OnPrimaryPause()
     {
         // perform select button action
-        InputController.ActiveInputMode = InputController.InputMode.Game;
-        TogglePause();
-        StopCoroutine(menuSelector);
+        buttons[selectedButtonIndex].onClick.Invoke();
     }
 
     void OnSecondaryPause()
     {
+        Quit();
+    }
+
+    private void SetupPauseMenu()
+    {
+        pauseMenu.SetActive(false);
+
+        buttons = new List<Button>(pauseButtonParent.GetComponentsInChildren<Button>());
+
+        if (startPaused)
+        {
+            TogglePause();
+        }
+    }
+
+    // Move to: Menu Handler
+    public void TogglePause()
+    {
+        Time.timeScale = 1 - Time.timeScale;
+        pauseMenu.SetActive(!pauseMenu.activeInHierarchy);
+
+        if (Time.timeScale == 1)
+        {
+            InputController.ActiveInputMode = InputController.InputMode.Game;
+
+            if (menuSelector != null)
+            {
+                StopCoroutine(menuSelector);
+                menuSelector = null;
+            }
+        }
+        else
+        {
+            InputController.ActiveInputMode = InputController.InputMode.Pause;
+            menuSelector = StartCoroutine(MenuSelection());
+            
+        }
+    }
+
+    // Move to: Menu Handler
+    IEnumerator MenuSelection()
+    {
+        selectedButtonIndex = startingIndex;
+        yield return null;
+        while (true)
+        {
+            Debug.Log("Selection " + selectedButtonIndex);
+            IndicateMenuButton(selectedButtonIndex);
+            yield return new WaitForSecondsRealtime(autoMoveInterval);
+
+            selectedButtonIndex = (selectedButtonIndex + 1) % buttons.Count;
+        }
+    }
+
+    // Move to: Menu Handler
+    void IndicateMenuButton(int index)
+    {
+        var btnRect = buttons[index].GetComponent<RectTransform>();
+        var pos = new Vector2(btnRect.localPosition.x, btnRect.localPosition.y);
+        menuSelectIndicator.anchoredPosition = pos;
+    }
+
+    public void Restart()
+    {
+        if (Time.timeScale == 0)
+        {
+            TogglePause();
+        }
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        UserProgress.Current.SetField(new int[0]);
+        return;
+    }
+
+    public void ClearSave()
+    {
+        PlayerPrefs.DeleteAll();
+        Restart();
+    }
+
+    public void Quit()
+    {
         // Exit Game
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#elif UNITY_WEBPLAYER
+        Application.OpenURL("google.com");
+#else
+        Application.Quit();
+#endif
     }
 
 
@@ -168,22 +225,17 @@ public class GameController : MonoBehaviour
             MoveDown();
         }
 
-        if (!isFalling)
+        // Auto move
+        if (!isFalling && !isPlaced)
         { 
-            if (!isPlaced)
+            if (elapsedTime >= autoMoveInterval)
             {
-                if (elapsedTime >= autoMoveInterval)
-                {
-                    elapsedTime = 0;
-                    // Move right
-                    MoveHorizontaly(1);
-                }
-                elapsedTime += Time.deltaTime;
+                elapsedTime = 0;
+                // Move right
+                MoveHorizontaly(1);
             }
-            // Spawn new brick
-
+            elapsedTime += Time.deltaTime;
         }
-        
     }
 
     bool LoadGame()
@@ -201,9 +253,10 @@ public class GameController : MonoBehaviour
             }
         }
 
-        currentPosition = new Vector2Int(placementStart, 0); // UserProgress.Current.CurrentBrick;
+        lastPlacementPosition = placementStart;
+        currentPosition = new Vector2Int(lastPlacementPosition, 0); // UserProgress.Current.CurrentBrick;
         previewBrick.Number = UserProgress.Current.NextBrick;
-        SpawnPlacement(placementStart, UserProgress.Current.CurrentBrickValue);
+        SpawnPlacement(lastPlacementPosition, UserProgress.Current.CurrentBrickValue);
         return true;
     }
 
@@ -254,9 +307,7 @@ public class GameController : MonoBehaviour
 
         if (field[currentPosition.x, currentPosition.y] != null)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            UserProgress.Current.SetField(new int[0]);
-            return;
+            Restart();
         }
 
         Spawn(currentPosition, brick);
@@ -269,7 +320,7 @@ public class GameController : MonoBehaviour
             brick = currentBrickInstance;
         }
 
-        Debug.Log(brick + " " + coords.ToString());
+        //Debug.Log(brick + " " + coords.ToString());
 
         brick.transform.SetParent(fieldTransform, false);
         brick.GetComponent<RectTransform>().anchorMin = Vector2.zero;
@@ -351,7 +402,8 @@ public class GameController : MonoBehaviour
                             {
                                 isFalling = false;
 
-                                currentPosition = new Vector2Int(placementStart, 0);
+                                lastPlacementPosition = currentPosition.x;
+                                currentPosition = new Vector2Int(lastPlacementPosition, 0);
                                 SpawnPlacement(currentPosition.x, previewBrick.Number);
 
                                 previewBrick.Number = GetRandomNumber();
