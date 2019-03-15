@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SgLib;
 
-public class PlayerController : MonoBehaviour
+public class GolfPlayerController : MonoBehaviour
 {
     // Use this for initialization
     public static event System.Action PlayerDied;
@@ -106,6 +106,7 @@ public class PlayerController : MonoBehaviour
                 isHoldingMouse = false;
             }
         }
+
     }
 
     IEnumerator CheckHitCount()
@@ -182,7 +183,6 @@ public class PlayerController : MonoBehaviour
 
     void CheckObjectMoving()
     {
-
         if (Time.time > startTime)
         {
             if (Mathf.Abs(currentPlayerPosition.magnitude - transform.position.magnitude) < 0.0008f)
@@ -191,7 +191,7 @@ public class PlayerController : MonoBehaviour
                 {
                     isHoldingMouse = true;
                 }
-                canDrag = false;
+                canDrag = true;
             }
             else
                 canDrag = false;
