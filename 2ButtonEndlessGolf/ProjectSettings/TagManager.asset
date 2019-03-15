@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - GameManager
+  - Gold
+  - DeathPlane
+  - CharacterSelectController
+  - UIManager
+  - Plane
+  - Ground
+  - GroundGenerator
+  - Ground1
+  - Ground2
+  - Circle
+  - Ground3
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Plane
+  - Player
+  - Ground
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: GroundGenerator
+    uniqueID: 1835054237
+    locked: 0
+  - name: Ground
+    uniqueID: 2185701741
+    locked: 0
