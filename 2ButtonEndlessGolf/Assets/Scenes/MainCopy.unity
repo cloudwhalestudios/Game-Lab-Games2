@@ -6064,7 +6064,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 71a22d897871ae246a0e216bba5a0eb1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 717d3eebc46022e499a747fc9e14976a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -6326,7 +6326,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: bcbfc6686ea3fa049b0cfb00f7e325a3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5c534fa7868b0424faa7b9e9ce67fd41, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -6345,8 +6345,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2108560611}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -29.23, y: -42.07, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
+  m_LocalPosition: {x: -27.64, y: -35.35, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 418322054}
   m_RootOrder: 1
@@ -6367,8 +6367,8 @@ BoxCollider2D:
   m_Offset: {x: -0.017374676, y: 3.4980469}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.10880991, y: 0.033201788}
-    oldSize: {x: 2.56, y: 5.12}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 10.24, y: 26.94}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -6420,6 +6420,11 @@ PrefabInstance:
       value: MainCanvas
       objectReference: {fileID: 0}
     - target: {fileID: 2491340360317690263, guid: b172ea95d9a83ce48b8dd18751d8e908,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2490933357730166477, guid: b172ea95d9a83ce48b8dd18751d8e908,
         type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -6533,11 +6538,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -74
-      objectReference: {fileID: 0}
-    - target: {fileID: 2490933357730166477, guid: b172ea95d9a83ce48b8dd18751d8e908,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2416261342095233019, guid: b172ea95d9a83ce48b8dd18751d8e908,
         type: 3}
