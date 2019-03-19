@@ -8,44 +8,30 @@ public class PlayerController : MonoBehaviour
     // Use this for initialization
     public static event System.Action PlayerDied;
 
-    Vector3 lastPosition;
-    Vector3 newPosition;
-    bool trackMouse = false;
+    [SerializeField] private Rigidbody2D myRB;
+    [SerializeField] private CircleCollider2D cCollider;
 
-    private float force;
-    GameObject invisibleArrow;
-    GameObject arrow;
-    Rigidbody2D myRB;
-    GameObject targetInArrow;
-    GameObject targetArrow;
-    [HideInInspector]
-    public bool canDrag = true;
+    [SerializeField] private int strokesTaken;
 
-    [HideInInspector]
-    public int hitcount;
+    [SerializeField] private float startTime;
 
-    Color isNotMoving;
-    Color isMoving;
-    float checkRate = 0.2f;
-    float startTime;
+    [SerializeField] private Transform checkGround;
+    [SerializeField] private float checkGroundRadius;
+    [SerializeField] private LayerMask layer;
 
-    Vector3 currentPlayerPosition;
+    [SerializeField] private TrailRenderer trailRender;
+    [SerializeField] private float timeTrail;
 
-    private Transform checkGround;
-    private float checkGroundRadius;
-    private LayerMask layer;
-    [HideInInspector]
-    public bool isGrounded;
-    CircleCollider2D cCollider;
+    [SerializeField] private Vector3 lastPosition;
+    [SerializeField] private Vector3 currentPlayerPosition;
 
-    bool checkTwo = false;
-    [HideInInspector]
-    public bool canHit = true;
-    [HideInInspector]
-    public bool isHoldingMouse = false;
+    [SerializeField] private float checkRate = 0.2f;
+    [SerializeField] private bool isGrounded;
+    [SerializeField] private bool isMoving;
+    [SerializeField] private bool allowHit;
 
-    private TrailRenderer trailRender;
-    private float timeTrail;
+    [SerializeField] private float force;
+    [SerializeField] private int score;
 
     void OnEnable()
     {
@@ -62,26 +48,22 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        checkGround = GameManager.Instance.checkGround;
-        checkGroundRadius = GameManager.Instance.checkGroundRadius;
-        layer = GameManager.Instance.groundLayer;
-        invisibleArrow = GameManager.Instance.inviArrow;
-        arrow = GameManager.Instance.dragArrow;
-        targetArrow = GameManager.Instance.targetArrow;
-        targetInArrow = GameManager.Instance.targetInArrow;
-        hitcount = GameManager.Instance.numberOfStroke;
-        force = GameManager.Instance.force;
-        isMoving = GameManager.Instance.isMoving;
-        isNotMoving = GameManager.Instance.isNotMoving;
-        checkRate = GameManager.Instance.checkRate;
-        transform.position = new Vector3(transform.position.x, transform.position.y, 5);
-        startTime = Time.time;
+
         myRB = GetComponent<Rigidbody2D>();
-        arrow.SetActive(false);
         cCollider = GetComponent<CircleCollider2D>();
 
+        // Apply game manager configuration
+        checkGroundRadius = GameManager.Instance.checkGroundRadius;
+        layer = GameManager.Instance.groundLayer;
+        force = GameManager.Instance.force;
+        trailRender.material.color = GameManager.Instance.isNotMoving;
+        checkRate = GameManager.Instance.checkRate;
         cCollider.sharedMaterial.friction = GameManager.Instance.friction;
         cCollider.sharedMaterial.bounciness = GameManager.Instance.bounciness;
+
+        // Move the transform infront of other sprites (z-axis)
+        transform.position = new Vector3(transform.position.x, transform.position.y, 5);
+        startTime = Time.time;
     }
 
 
@@ -92,109 +74,19 @@ public class PlayerController : MonoBehaviour
 
         if (!isGrounded)
             myRB.AddForce(new Vector2(-GameManager.Instance.windForce, 0));
-
-        if (canDrag && hitcount == 0)
-        {
-            StartCoroutine(CheckHitCount());
-        }
-        MouseInput();
-
-        if (isHoldingMouse)
-        {
-            if (Input.GetButtonUp("Fire1"))
-            {
-                isHoldingMouse = false;
-            }
-        }
-    }
-
-    IEnumerator CheckHitCount()
-    {
-        yield return new WaitForSeconds(0.5f);
-        if (canDrag)
-        {
-            yield return new WaitForSeconds(0.5f);
-            if (hitcount == 0 && !checkTwo)
-            {
-                checkTwo = true;
-                Die();
-            }
-        }
-    }
-
-    void MouseInput()
-    {
-        if (!isHoldingMouse)
-        {
-            if (Input.GetButtonDown("Fire1"))
-            {
-                trackMouse = true;
-                arrow.SetActive(true);
-                lastPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                invisibleArrow.transform.position = transform.position;
-                arrow.transform.position = lastPosition;
-            }
-
-            if (Input.GetButtonUp("Fire1"))
-            {
-                trackMouse = false;
-
-                Vector2 dir = targetInArrow.transform.position - transform.position;
-                dir = dir.normalized;
-                if (canDrag && hitcount > 0 && canHit)
-                {
-                    myRB.AddForce(dir * force * (newPosition - lastPosition).magnitude);
-                    hitcount--;
-                    SoundManager.Instance.PlaySound(SoundManager.Instance.hit);
-                }
-                else myRB.AddForce(new Vector2(0, 0));
-                arrow.SetActive(false);
-            }
-
-            if (trackMouse)
-            {
-                newPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                Vector3 mouse = Input.mousePosition;
-                Vector2 screenPoint = Camera.main.WorldToScreenPoint(lastPosition);
-                Vector2 offset = new Vector2(mouse.x - screenPoint.x, mouse.y - screenPoint.y);
-                float angle = Mathf.Atan2(offset.y, offset.x) * Mathf.Rad2Deg;
-
-                invisibleArrow.transform.rotation = Quaternion.Euler(0, 0, angle);
-                invisibleArrow.transform.position = transform.position;
-                arrow.transform.rotation = Quaternion.Euler(0, 0, angle);
-
-                arrow.transform.Find("Body").localScale = new Vector3((newPosition - lastPosition).magnitude, arrow.transform.Find("Body").localScale.y, 1);
-                arrow.transform.Find("Head").position = targetArrow.transform.position;
-
-                if (canDrag && hitcount > 0)
-                {
-                    arrow.transform.Find("Body").GetComponent<SpriteRenderer>().color = isMoving;
-                    arrow.transform.Find("Head").GetComponent<SpriteRenderer>().color = isMoving;
-                }
-                else
-                {
-                    arrow.transform.Find("Body").GetComponent<SpriteRenderer>().color = isNotMoving;
-                    arrow.transform.Find("Head").GetComponent<SpriteRenderer>().color = isNotMoving;
-                }
-            }
-        }
     }
 
     void CheckObjectMoving()
     {
-
         if (Time.time > startTime)
         {
             if (Mathf.Abs(currentPlayerPosition.magnitude - transform.position.magnitude) < 0.0008f)
             {
-                if (Input.GetButton("Fire1"))
-                {
-                    isHoldingMouse = true;
-                }
-                canDrag = false;
+                isMoving = false;
+                allowHit = true;
             }
             else
-                canDrag = false;
+                allowHit = false;
             currentPlayerPosition = transform.position;
             startTime = Time.time + checkRate;
         }

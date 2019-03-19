@@ -66,11 +66,6 @@ public class GameManager : MonoBehaviour
     public float force = 200;
     public float checkRate = 0.2f;
 
-    public GameObject dragArrow;
-    public GameObject targetArrow;
-    public GameObject inviArrow;
-    public GameObject targetInArrow;
-
     public Transform checkGround;
     public float checkGroundRadius = 0.1f;
     public LayerMask groundLayer;

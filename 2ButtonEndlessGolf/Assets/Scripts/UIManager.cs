@@ -35,14 +35,14 @@ public class UIManager : MonoBehaviour
 
     void OnEnable()
     {
-        GameManager.GameStateChanged += GameManager_GameStateChanged;
-        ScoreManager.ScoreUpdated += OnScoreUpdated;
+        GameManager.GameStateChanged    += GameManager_GameStateChanged;
+        ScoreManager.ScoreUpdated       += OnScoreUpdated;
     }
 
     void OnDisable()
     {
-        GameManager.GameStateChanged -= GameManager_GameStateChanged;
-        ScoreManager.ScoreUpdated -= OnScoreUpdated;
+        GameManager.GameStateChanged    -= GameManager_GameStateChanged;
+        ScoreManager.ScoreUpdated       -= OnScoreUpdated;
     }
 
     // Use this for initialization
