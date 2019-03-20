@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4100173448005604680
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4100173448005604686}
+  - component: {fileID: 4100173448005604681}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: GameManager
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4100173448005604686
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4100173448005604680}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4100173448005604681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4100173448005604680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ec9db28601c3a9489109a50383327d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gameState: 0
+  _turnState: 0
+  targetFrameRate: 60
+  autoInterval: 0.5
+  goalObject: {fileID: 0}
+  checkPointBelow: 0.1
+  playerPrefab: {fileID: 0}
+  isNotMoving: {r: 0, g: 0.09174347, b: 1, a: 1}
+  isMoving: {r: 1, g: 0, b: 0, a: 1}
+  force: 200
+  checkRate: 0.2
+  checkGround: {fileID: 0}
+  checkGroundRadius: 0.1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  friction: 0.03
+  bounciness: 0.2
+  availableUndosPerMap: 3
+  numberOfStroke: 5
+  strokeAdd: 3
+  minWindForce: 0
+  maxWindForce: 5
+  bodyXscale: 0.2
+  bodyYscale: 0.2
+  windForce: 0
+  coinFrequency: 1
+  smoothTime: 2
+  distanceBottoCam: 15
+  niceHit: 0
+  minFallingSpeed: -20
+  maxFallingSpeed: 5
+  ratioWithWindForce: 1
+  playerController: {fileID: 0}
+  fallingEffect: {fileID: 0}

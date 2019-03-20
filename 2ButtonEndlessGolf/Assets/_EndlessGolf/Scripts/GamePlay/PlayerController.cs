@@ -1,37 +1,44 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using SgLib;
 
+// TODO convert to base class
 public class PlayerController : MonoBehaviour
 {
-    // Use this for initialization
-    public static event System.Action PlayerDied;
+    [SerializeField] private int _playerID = -1;
+
+    public int PlayerID
+    {
+        protected set
+        {
+            _playerID = value;
+        }
+        get
+        {
+            return _playerID;
+        }
+    }
 
     [SerializeField] private Rigidbody2D myRB;
     [SerializeField] private CircleCollider2D cCollider;
 
     [SerializeField] private int strokesTaken;
 
-    [SerializeField] private float startTime;
-
     [SerializeField] private Transform checkGround;
-    [SerializeField] private float checkGroundRadius;
-    [SerializeField] private LayerMask layer;
-
+    
     [SerializeField] private TrailRenderer trailRender;
     [SerializeField] private float timeTrail;
 
-    [SerializeField] private Vector3 lastPosition;
     [SerializeField] private Vector3 currentPlayerPosition;
-
-    [SerializeField] private float checkRate = 0.2f;
     [SerializeField] private bool isGrounded;
     [SerializeField] private bool isMoving;
     [SerializeField] private bool allowHit;
+    [SerializeField] private float startTime;
 
-    [SerializeField] private float force;
     [SerializeField] private int score;
+    public int availableUndos;
+    
 
     void OnEnable()
     {
@@ -39,37 +46,31 @@ public class PlayerController : MonoBehaviour
         timeTrail = trailRender.time;
     }
 
-    // Calls this when the player dies and game over
-    public void Die()
-    {
-        // Fire event
-        PlayerDied();
-    }
-
     private void Start()
     {
-
+        // Get components
         myRB = GetComponent<Rigidbody2D>();
         cCollider = GetComponent<CircleCollider2D>();
 
         // Apply game manager configuration
-        checkGroundRadius = GameManager.Instance.checkGroundRadius;
-        layer = GameManager.Instance.groundLayer;
-        force = GameManager.Instance.force;
         trailRender.material.color = GameManager.Instance.isNotMoving;
-        checkRate = GameManager.Instance.checkRate;
         cCollider.sharedMaterial.friction = GameManager.Instance.friction;
         cCollider.sharedMaterial.bounciness = GameManager.Instance.bounciness;
+        availableUndos = GameManager.Instance.availableUndosPerLevel;
 
         // Move the transform infront of other sprites (z-axis)
         transform.position = new Vector3(transform.position.x, transform.position.y, 5);
-        startTime = Time.time;
-    }
 
+     }
+
+    public void Init(int id)
+    {
+        PlayerID = id;
+    }
 
     void Update()
     {
-        isGrounded = Physics2D.OverlapCircle(checkGround.position, checkGroundRadius, layer);
+        isGrounded = Physics2D.OverlapCircle(checkGround.position, GameManager.Instance.checkGroundRadius, GameManager.Instance.groundLayer);
         CheckObjectMoving();
 
         if (!isGrounded)
@@ -88,7 +89,7 @@ public class PlayerController : MonoBehaviour
             else
                 allowHit = false;
             currentPlayerPosition = transform.position;
-            startTime = Time.time + checkRate;
+            startTime = Time.time + GameManager.Instance.checkRate;
         }
     }
 

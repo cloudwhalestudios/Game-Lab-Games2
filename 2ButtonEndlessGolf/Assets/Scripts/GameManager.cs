@@ -1,4 +1,5 @@
 ﻿using SgLib;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,12 +14,23 @@ public enum GameState
     GameOver
 }
 
+public enum TurnState
+{
+    NotPlaying,
+    Start,
+    Angle,
+    Power,
+    Firing,
+    End
+}
+
 public class GameManager : MonoBehaviour
 {
     // Start is called before the first frame update
     public static GameManager Instance { get; private set; }
 
     public static event System.Action<GameState, GameState> GameStateChanged = delegate { };
+    public static event System.Action<TurnState, TurnState> TurnStateChanged = delegate { };
 
     private static bool isRestart;
 
@@ -40,7 +52,27 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private GameState _gameState = GameState.Prepare;
+    public TurnState TurnState
+    {
+        get
+        {
+            return _turnState;
+        }
+        private set
+        {
+            if (value != _turnState)
+            {
+                TurnState oldState = _turnState;
+                _turnState = value;
+
+                TurnStateChanged(_turnState, oldState);
+            }
+        }
+    }
+
+    [SerializeField] private GameState _gameState = GameState.Prepare;
+
+    [SerializeField] private TurnState _turnState = TurnState.NotPlaying;
 
     public static int GameCount
     {
@@ -54,28 +86,30 @@ public class GameManager : MonoBehaviour
     [Tooltip("Use 60 for games requiring smooth quick motion, set -1 to use platform default frame rate")]
     public int targetFrameRate = 30;
 
-    // List of public variable for gameplay tweaking
+    [Header("Accessibility")]
+    public float autoInterval = 1f;
 
     [Header("Goal Config")]
-    public GameObject holeCheckPoint;
+    public GameObject goalObject;
     public float checkPointBelow;
 
     [Header("Player Config")]
+    public GameObject playerPrefab;
     public Color isNotMoving;
     public Color isMoving;
     public float force = 200;
     public float checkRate = 0.2f;
 
-    public Transform checkGround;
     public float checkGroundRadius = 0.1f;
     public LayerMask groundLayer;
 
     public float friction = 0.03f;
     public float bounciness = 0.2f;
 
+    public int availableUndosPerLevel = 3;
+
     [Header("Gameplay Config")]
-    public int numberOfStroke = 5;
-    public int strokeAdd = 3;
+    public float endOfTurnTime = 2f;
 
     public float minWindForce;
     public float maxWindForce;
@@ -84,8 +118,6 @@ public class GameManager : MonoBehaviour
     public float bodyYscale = 0.2f;
     [HideInInspector]
     public float windForce;
-    [Range(0f, 1f)]
-    public float coinFrequency = 0.1f;
 
     [Header("Camera Config")]
     public float smoothTime = 2f;
@@ -107,16 +139,6 @@ public class GameManager : MonoBehaviour
     public ParticleSystem.VelocityOverLifetimeModule velocity;
 
     private float curWindForce;
-
-    void OnEnable()
-    {
-        PlayerController.PlayerDied += PlayerController_PlayerDied;
-    }
-
-    void OnDisable()
-    {
-        PlayerController.PlayerDied -= PlayerController_PlayerDied;
-    }
 
     void Awake()
     {
@@ -145,7 +167,6 @@ public class GameManager : MonoBehaviour
     {
         // Initial setup
         Application.targetFrameRate = targetFrameRate;
-        ScoreManager.Instance.Reset();
 
         PrepareGame();
         velocity.y = new ParticleSystem.MinMaxCurve(minFallingSpeed, maxFallingSpeed);
@@ -170,6 +191,46 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void AdvanceTurn()
+    {
+        switch (TurnState)
+        {
+            case TurnState.NotPlaying:
+                TurnState = TurnState.Start;
+                break;
+            case TurnState.Start:
+                TurnState = TurnState.Angle;
+                break;
+            case TurnState.Angle:
+                TurnState = TurnState.Power;
+                break;
+            case TurnState.Power:
+                TurnState = TurnState.Firing;
+                break;
+            case TurnState.Firing:
+                TurnState = TurnState.End;
+                break;
+            case TurnState.End:
+                TurnState = TurnState.Start;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public bool UndoMove(TurnState targetState)
+    {
+        switch (targetState)
+        {
+            case TurnState.Angle:
+            case TurnState.Power:
+                TurnState = targetState;
+                return true;
+            default:
+                return false;
+        }
+    }
+
     // Listens to the event when player dies and call GameOver
     void PlayerController_PlayerDied()
     {
@@ -180,8 +241,7 @@ public class GameManager : MonoBehaviour
     public void PrepareGame()
     {
         GameState = GameState.Prepare;
-        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().enabled = false;
-        dragArrow.SetActive(false);
+
         if (isRestart)
         {
             isRestart = false;
@@ -197,8 +257,6 @@ public class GameManager : MonoBehaviour
         {
             SoundManager.Instance.PlayMusic(SoundManager.Instance.background);
         }
-
-        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().enabled = true;
     }
 
     // Called when the player died
@@ -213,7 +271,7 @@ public class GameManager : MonoBehaviour
         GameState = GameState.GameOver;
         GameCount++;
         GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().enabled = false;
-        dragArrow.SetActive(false);
+
         // Add other game over actions here if necessary
     }
 

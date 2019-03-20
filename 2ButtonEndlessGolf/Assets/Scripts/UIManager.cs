@@ -58,11 +58,8 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        score.text = ScoreManager.Instance.Score.ToString();
-        bestScore.text = ScoreManager.Instance.HighScore.ToString();
+        //bestScore.text = ScoreManager.Instance.HighScore.ToString();
         //coinText.text = CoinManager.Instance.Coins.ToString();
-        if (playerController != null)
-            strokeRemainingText.text = playerController.hitcount.ToString();
 
         if (settingsUI.activeSelf)
         {

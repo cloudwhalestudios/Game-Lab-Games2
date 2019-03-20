@@ -36,13 +36,13 @@ public class MenuAssistance : MonoBehaviour
         StopAllCoroutines();
     }
 
-    void OnPrimaryPause()
+    void OnPrimaryPause(KeyCode key)
     {
         // perform select button action
         buttons[selectedButtonIndex].onClick.Invoke();
     }
 
-    void OnSecondaryPause()
+    void OnSecondaryPause(KeyCode key)
     {
         Quit();
     }
