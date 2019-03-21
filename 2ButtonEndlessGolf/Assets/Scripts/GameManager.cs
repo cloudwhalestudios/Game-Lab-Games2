@@ -29,8 +29,9 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     public static GameManager Instance { get; private set; }
 
-    public static event System.Action<GameState, GameState> GameStateChanged = delegate { };
-    public static event System.Action<TurnState, TurnState> TurnStateChanged = delegate { };
+    public static event Action<GameState, GameState> GameStateChanged = delegate { };
+    public static event Action<TurnState, TurnState> TurnStateChanged = delegate { };
+    public static event Action<Collider2D> MapBoundsExit = delegate { };
 
     private static bool isRestart;
 
@@ -84,14 +85,16 @@ public class GameManager : MonoBehaviour
 
     [Header("Set the target frame rate for this game")]
     [Tooltip("Use 60 for games requiring smooth quick motion, set -1 to use platform default frame rate")]
-    public int targetFrameRate = 30;
+    public int targetFrameRate = -1;
 
     [Header("Accessibility")]
     public float autoInterval = 1f;
+    public float endOfTurnTime = 2f;
 
-    [Header("Goal Config")]
+    [Header("Map Config")]
     public GameObject goalObject;
     public float checkPointBelow;
+    public GameObject mapBounds;
 
     [Header("Player Config")]
     public GameObject playerPrefab;
@@ -107,33 +110,13 @@ public class GameManager : MonoBehaviour
     public float bounciness = 0.2f;
 
     public int availableUndosPerLevel = 3;
-
-    [Header("Gameplay Config")]
-    public float endOfTurnTime = 2f;
-
-    public float minWindForce;
-    public float maxWindForce;
-
-    public float bodyXscale = 0.2f;
-    public float bodyYscale = 0.2f;
-    [HideInInspector]
-    public float windForce;
-
-    [Header("Camera Config")]
-    public float smoothTime = 2f;
-    public float distanceBottoCam = 15;
-    [HideInInspector]
-    public bool niceHit;
+    public int availableRetriesPerShot = 3;
 
     [Header("Falling Effect")]
     public float minFallingSpeed = -20;
     public float maxFallingSpeed = 5;
     public float ratioWithWindForce = 1;
-
-    // List of public variables referencing other objects
-    [Header("Object References")]
-    public PlayerController playerController;
-    public ParticleSystem fallingEffect;
+    public ParticleSystem fallingEffect;    
 
     [HideInInspector]
     public ParticleSystem.VelocityOverLifetimeModule velocity;
@@ -179,7 +162,7 @@ public class GameManager : MonoBehaviour
 
     public void UpdateEffect()
     {
-        if (curWindForce != windForce)
+        /*if (curWindForce != windForce)
         {
             float value = -(windForce * ratioWithWindForce);
             if (value == 0)
@@ -188,18 +171,18 @@ public class GameManager : MonoBehaviour
                 velocity.y = new ParticleSystem.MinMaxCurve(minFallingSpeed, maxFallingSpeed);
             velocity.x = new ParticleSystem.MinMaxCurve(value, value);
             curWindForce = windForce;
-        }
+        }*/
     }
 
-    public void AdvanceTurn()
+    public void AdvanceTurn(bool playerInput = false)
     {
         switch (TurnState)
         {
             case TurnState.NotPlaying:
-                TurnState = TurnState.Start;
+                if (!playerInput) TurnState = TurnState.Start;
                 break;
             case TurnState.Start:
-                TurnState = TurnState.Angle;
+                if (!playerInput) TurnState = TurnState.Angle;
                 break;
             case TurnState.Angle:
                 TurnState = TurnState.Power;
@@ -208,10 +191,10 @@ public class GameManager : MonoBehaviour
                 TurnState = TurnState.Firing;
                 break;
             case TurnState.Firing:
-                TurnState = TurnState.End;
+                if (!playerInput) TurnState = TurnState.End;
                 break;
             case TurnState.End:
-                TurnState = TurnState.Start;
+                if (!playerInput) TurnState = TurnState.Start;
                 break;
             default:
                 break;
@@ -287,5 +270,10 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        MapBoundsExit(collision);
     }
 }

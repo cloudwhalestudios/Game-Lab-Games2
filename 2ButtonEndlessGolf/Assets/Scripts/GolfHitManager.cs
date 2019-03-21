@@ -10,11 +10,7 @@ public class GolfHitManager : MonoBehaviour
 
     public float CurrentPowerPercentage
     {
-        get
-        {
-            return _currentPowerPercentage;
-        }
-
+        get { return _currentPowerPercentage; }
         private set
         {
             
@@ -24,18 +20,12 @@ public class GolfHitManager : MonoBehaviour
 
     public float CurrentAnglePercentage
     {
-        get
-        {
-            return _currentAnglePercentage;
-        }
-
+        get { return _currentAnglePercentage; }
         private set
         {
             _currentAnglePercentage = Mathf.Clamp01(value);
         }
     }
-
-
 
     [SerializeField] private RectTransform angleIndicator;
     [SerializeField] private RectTransform powerIndicator;
@@ -43,11 +33,11 @@ public class GolfHitManager : MonoBehaviour
     [SerializeField] private float angleStep = .33f;
     [Range(0.01f, 1f)]
     [SerializeField] private float powerStep = .33f;
-    [SerializeField] private float stepInterval;
+    private float stepInterval;
 
-    [SerializeField] private float _currentAnglePercentage;
-    [SerializeField] private float _currentPowerPercentage;
-    [SerializeField] private bool invertFill;
+    private float _currentAnglePercentage;
+    private float _currentPowerPercentage;
+    private bool invertFill;
 
 
     void Awake()
@@ -145,9 +135,9 @@ public class GolfHitManager : MonoBehaviour
         print("Bouncing power!");
         while(true)
         {
+            yield return new WaitForSeconds(stepInterval);
             CurrentPowerPercentage += (invertFill) ? -powerStep : powerStep;
             CheckFillDirection(CurrentPowerPercentage);
-            yield return new WaitForSeconds(stepInterval);
         }
     }
 
@@ -156,9 +146,9 @@ public class GolfHitManager : MonoBehaviour
         print("Bouncing angle!");
         while (true)
         {
+            yield return new WaitForSeconds(stepInterval);
             CurrentAnglePercentage += (invertFill) ? -angleStep : angleStep;
             CheckFillDirection(CurrentAnglePercentage);
-            yield return new WaitForSeconds(stepInterval);
         }
     }
 

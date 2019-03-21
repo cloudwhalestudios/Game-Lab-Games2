@@ -49,7 +49,7 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         scoreAnimator = score.GetComponent<Animator>();
-        playerController = GameManager.Instance.playerController;
+        //playerController = GameManager.Instance.playerController;
 
         Reset();
         ShowStartUI();

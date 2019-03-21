@@ -8,22 +8,17 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private int _playerID = -1;
 
-    public int PlayerID
-    {
-        protected set
-        {
-            _playerID = value;
-        }
-        get
-        {
-            return _playerID;
-        }
-    }
+    public int PlayerID { protected set; get; }
+    public Rigidbody2D Rb { get => _rb; set => _rb = value; }
+    public int StrokesTaken { get => _strokesTaken; set => _strokesTaken = value; }
 
-    [SerializeField] private Rigidbody2D myRB;
+    public bool IsGrounded { get => _isGrounded; set => _isGrounded = value; }
+    public bool IsMoving { get => _isMoving; set => _isMoving = value; }
+
+    [SerializeField] private Rigidbody2D _rb;
     [SerializeField] private CircleCollider2D cCollider;
 
-    [SerializeField] private int strokesTaken;
+    [SerializeField] private int _strokesTaken;
 
     [SerializeField] private Transform checkGround;
     
@@ -31,14 +26,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float timeTrail;
 
     [SerializeField] private Vector3 currentPlayerPosition;
-    [SerializeField] private bool isGrounded;
-    [SerializeField] private bool isMoving;
-    [SerializeField] private bool allowHit;
+    [SerializeField] private bool _isGrounded;
+    [SerializeField] private bool _isMoving;
     [SerializeField] private float startTime;
 
     [SerializeField] private int score;
     public int availableUndos;
-    
 
     void OnEnable()
     {
@@ -49,7 +42,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         // Get components
-        myRB = GetComponent<Rigidbody2D>();
+        Rb = GetComponent<Rigidbody2D>();
         cCollider = GetComponent<CircleCollider2D>();
 
         // Apply game manager configuration
@@ -70,11 +63,11 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        isGrounded = Physics2D.OverlapCircle(checkGround.position, GameManager.Instance.checkGroundRadius, GameManager.Instance.groundLayer);
+        IsGrounded = Physics2D.OverlapCircle(checkGround.position, GameManager.Instance.checkGroundRadius, GameManager.Instance.groundLayer);
         CheckObjectMoving();
 
-        if (!isGrounded)
-            myRB.AddForce(new Vector2(-GameManager.Instance.windForce, 0));
+        /*if (!isGrounded)
+            myRB.AddForce(new Vector2(-GameManager.Instance.windForce, 0));*/
     }
 
     void CheckObjectMoving()
@@ -83,11 +76,14 @@ public class PlayerController : MonoBehaviour
         {
             if (Mathf.Abs(currentPlayerPosition.magnitude - transform.position.magnitude) < 0.0008f)
             {
-                isMoving = false;
-                allowHit = true;
+                IsMoving = false;
+                Rb.velocity = Vector2.zero;
             }
             else
-                allowHit = false;
+            {
+                IsMoving = true;
+            }
+
             currentPlayerPosition = transform.position;
             startTime = Time.time + GameManager.Instance.checkRate;
         }
