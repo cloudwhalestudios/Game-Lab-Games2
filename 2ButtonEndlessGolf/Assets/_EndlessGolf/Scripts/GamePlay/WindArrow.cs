@@ -17,7 +17,7 @@ public class WindArrow : MonoBehaviour
 
     void Update()
     {
-        body.transform.localScale = new Vector3(GameManager.Instance.bodyXscale * Mathf.Abs(GameManager.Instance.windForce), 1, 1);
+        /*body.transform.localScale = new Vector3(GameManager.Instance.bodyXscale * Mathf.Abs(GameManager.Instance.windForce), 1, 1);
         if (GameManager.Instance.windForce != 0)
         {
             head.transform.localScale = Vector3.one;
@@ -33,6 +33,6 @@ public class WindArrow : MonoBehaviour
         else
         {
             head.transform.localScale = Vector3.zero;
-        }
+        }*/
     }
 }

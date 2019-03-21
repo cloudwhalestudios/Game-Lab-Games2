@@ -1,4 +1,5 @@
 ﻿using SgLib;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,11 +7,28 @@ using UnityEngine.SceneManagement;
 
 public enum GameState
 {
-    Prepare,
+    MainMenu,
+    LevelSelect,
     Playing,
     Paused,
     PreGameOver,
     GameOver
+}
+
+public enum TurnState
+{
+    NotPlaying,
+    Start,
+    Angle,
+    Power,
+    Firing,
+    End
+}
+
+[Serializable]
+public class Level : ScriptableObject
+{
+    public Scene scene;
 }
 
 public class GameManager : MonoBehaviour
@@ -18,7 +36,9 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     public static GameManager Instance { get; private set; }
 
-    public static event System.Action<GameState, GameState> GameStateChanged = delegate { };
+    public static event Action<GameState, GameState> GameStateChanged = delegate { };
+    public static event Action<TurnState, TurnState> TurnStateChanged = delegate { };
+    public static event Action<Collider2D> MapBoundsExit = delegate { };
 
     private static bool isRestart;
 
@@ -40,7 +60,27 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private GameState _gameState = GameState.Prepare;
+    public TurnState TurnState
+    {
+        get
+        {
+            return _turnState;
+        }
+        private set
+        {
+            if (value != _turnState)
+            {
+                TurnState oldState = _turnState;
+                _turnState = value;
+
+                TurnStateChanged(_turnState, oldState);
+            }
+        }
+    }
+
+    [SerializeField] private GameState _gameState;
+
+    [SerializeField] private TurnState _turnState = TurnState.NotPlaying;
 
     public static int GameCount
     {
@@ -52,89 +92,48 @@ public class GameManager : MonoBehaviour
 
     [Header("Set the target frame rate for this game")]
     [Tooltip("Use 60 for games requiring smooth quick motion, set -1 to use platform default frame rate")]
-    public int targetFrameRate = 30;
+    public int targetFrameRate = -1;
 
-    // List of public variable for gameplay tweaking
+    [Header("Accessibility")]
+    public float autoInterval = 1f;
+    public float endOfTurnTime = 2f;
 
-    [Header("Goal Config")]
-    public GameObject holeCheckPoint;
+    [Header("Current Level Config")]
+    public GameObject goalObject;
     public float checkPointBelow;
+    public GameObject mapBounds;
+
+    [Header("Level Config")]
 
     [Header("Player Config")]
-    public Color isNotMoving;
-    public Color isMoving;
+    public GameObject playerPrefab;
+    public RectTransform playerUIContainer;
+    public GameObject playerUIPrefab;
+    public GameObject pressToJoinPlaceholder;
+    public NewPlayerDialog newPlayerDialog;
     public float force = 200;
     public float checkRate = 0.2f;
 
-    public GameObject dragArrow;
-    public GameObject targetArrow;
-    public GameObject inviArrow;
-    public GameObject targetInArrow;
-
-    public Transform checkGround;
     public float checkGroundRadius = 0.1f;
     public LayerMask groundLayer;
 
     public float friction = 0.03f;
     public float bounciness = 0.2f;
 
-    [Header("Gameplay Config")]
-    public int numberOfStroke = 5;
-    public int strokeAdd = 3;
-
-    public float minWindForce;
-    public float maxWindForce;
-
-    public float bodyXscale = 0.2f;
-    public float bodyYscale = 0.2f;
-    [HideInInspector]
-    public float windForce;
-    [Range(0f, 1f)]
-    public float coinFrequency = 0.1f;
-
-    [Header("Camera Config")]
-    public float smoothTime = 2f;
-    public float distanceBottoCam = 15;
-    [HideInInspector]
-    public bool niceHit;
-
-    [Header("Falling Effect")]
-    public float minFallingSpeed = -20;
-    public float maxFallingSpeed = 5;
-    public float ratioWithWindForce = 1;
-
-    // List of public variables referencing other objects
-    [Header("Object References")]
-    public PlayerController playerController;
-    public ParticleSystem fallingEffect;
-
-    [HideInInspector]
-    public ParticleSystem.VelocityOverLifetimeModule velocity;
-
-    private float curWindForce;
-
-    void OnEnable()
-    {
-        PlayerController.PlayerDied += PlayerController_PlayerDied;
-    }
-
-    void OnDisable()
-    {
-        PlayerController.PlayerDied -= PlayerController_PlayerDied;
-    }
+    public int availableUndosPerLevel = 3;
+    public int availableRetriesPerShot = 3;
 
     void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(this);
         }
         else
         {
-            DestroyImmediate(Instance.gameObject);
-            Instance = this;
+            DestroyImmediate(this);
         }
-        velocity = fallingEffect.velocityOverLifetime;
     }
 
     void OnDestroy()
@@ -150,75 +149,105 @@ public class GameManager : MonoBehaviour
     {
         // Initial setup
         Application.targetFrameRate = targetFrameRate;
-        ScoreManager.Instance.Reset();
-
-        PrepareGame();
-        velocity.y = new ParticleSystem.MinMaxCurve(minFallingSpeed, maxFallingSpeed);
+        StartMainMenu();
     }
 
-    void Update()
+    public void AdvanceTurn(bool playerInput = false)
     {
-        UpdateEffect();
-    }
-
-    public void UpdateEffect()
-    {
-        if (curWindForce != windForce)
+        switch (TurnState)
         {
-            float value = -(windForce * ratioWithWindForce);
-            if (value == 0)
-                velocity.y = new ParticleSystem.MinMaxCurve(minFallingSpeed, minFallingSpeed / 2);
-            else
-                velocity.y = new ParticleSystem.MinMaxCurve(minFallingSpeed, maxFallingSpeed);
-            velocity.x = new ParticleSystem.MinMaxCurve(value, value);
-            curWindForce = windForce;
+            case TurnState.NotPlaying:
+                if (!playerInput) TurnState = TurnState.Start;
+                break;
+            case TurnState.Start:
+                if (!playerInput) TurnState = TurnState.Angle;
+                break;
+            case TurnState.Angle:
+                TurnState = TurnState.Power;
+                break;
+            case TurnState.Power:
+                TurnState = TurnState.Firing;
+                break;
+            case TurnState.Firing:
+                if (!playerInput) TurnState = TurnState.End;
+                break;
+            case TurnState.End:
+                if (!playerInput) TurnState = TurnState.Start;
+                break;
+            default:
+                break;
         }
     }
 
-    // Listens to the event when player dies and call GameOver
-    void PlayerController_PlayerDied()
+    public bool UndoMove(TurnState targetState)
     {
-        GameOver();
+        switch (targetState)
+        {
+            case TurnState.Angle:
+            case TurnState.Power:
+                TurnState = targetState;
+                return true;
+            default:
+                return false;
+        }
     }
 
     // Make initial setup and preparations before the game can be played
-    public void PrepareGame()
+    public void StartMainMenu()
     {
-        GameState = GameState.Prepare;
-        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().enabled = false;
-        dragArrow.SetActive(false);
-        if (isRestart)
+        GameState = GameState.MainMenu;
+        // StartUp Scene
+    }
+
+    public void UpdateScene()
+    {
+        switch (GameState)
         {
-            isRestart = false;
-            StartGame();
+            case GameState.MainMenu:
+            case GameState.LevelSelect:
+                SceneManager.LoadScene((int)GameState);
+                break;
         }
+    }
+
+    public void OpenLevel(int levelIndex)
+    {
+
+    }
+
+    public void StartLevelSelect ()
+    {
+        GameState = GameState.LevelSelect;
     }
 
     // A new game official starts
     public void StartGame()
     {
         GameState = GameState.Playing;
-        if (SoundManager.Instance.background != null)
+        if (SoundManager.Instance.backgroundGame != null)
         {
-            SoundManager.Instance.PlayMusic(SoundManager.Instance.background);
+            SoundManager.Instance.PlayMusic(SoundManager.Instance.backgroundGame);
         }
+    }
 
-        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().enabled = true;
+    public void StartLevel()
+    {
+        TurnState = TurnState.Start;
     }
 
     // Called when the player died
     public void GameOver()
     {
-        if (SoundManager.Instance.background != null)
+        if (SoundManager.Instance.backgroundGame != null)
         {
             SoundManager.Instance.StopMusic();
         }
 
-        SoundManager.Instance.PlaySound(SoundManager.Instance.gameOver, true);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.outOfBounds, true);
         GameState = GameState.GameOver;
         GameCount++;
         GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().enabled = false;
-        dragArrow.SetActive(false);
+
         // Add other game over actions here if necessary
     }
 
@@ -234,5 +263,10 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        MapBoundsExit(collision);
     }
 }

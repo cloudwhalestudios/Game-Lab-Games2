@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class PointerInputController : InputController, IPointerDownHandler, IPointerClickHandler, IDragHandler
+// TODO add point input
+public class PointerInputController : IPointerDownHandler, IPointerClickHandler, IDragHandler //, InputController
 {
     public float swipeThreshold = 20f;
     public float moveThreshold = 80f;
@@ -21,21 +22,22 @@ public class PointerInputController : InputController, IPointerDownHandler, IPoi
             return;
 
         float xDelta = eventData.position.x - eventData.pressPosition.x;
-        if (xDelta > swipeThreshold)
+        /*if (xDelta > swipeThreshold)
             OnSecondary();
         else if (xDelta < -swipeThreshold)
-            OnPrimary();
+            OnPrimary();*/
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        /*
         if (eventData.position.x - lastMoveCallback.x >= moveThreshold)
             OnSecondary();
         else if (eventData.position.x - lastMoveCallback.x <= -moveThreshold)
             OnPrimary();
         else
             return;
-
+            */
         lastMoveCallback = eventData.position;
         isMoved = true;
     }

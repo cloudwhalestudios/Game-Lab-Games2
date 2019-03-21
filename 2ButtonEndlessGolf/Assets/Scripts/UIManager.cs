@@ -35,21 +35,21 @@ public class UIManager : MonoBehaviour
 
     void OnEnable()
     {
-        GameManager.GameStateChanged += GameManager_GameStateChanged;
-        ScoreManager.ScoreUpdated += OnScoreUpdated;
+        GameManager.GameStateChanged    += GameManager_GameStateChanged;
+        ScoreManager.ScoreUpdated       += OnScoreUpdated;
     }
 
     void OnDisable()
     {
-        GameManager.GameStateChanged -= GameManager_GameStateChanged;
-        ScoreManager.ScoreUpdated -= OnScoreUpdated;
+        GameManager.GameStateChanged    -= GameManager_GameStateChanged;
+        ScoreManager.ScoreUpdated       -= OnScoreUpdated;
     }
 
     // Use this for initialization
     void Start()
     {
         scoreAnimator = score.GetComponent<Animator>();
-        playerController = GameManager.Instance.playerController;
+        //playerController = GameManager.Instance.playerController;
 
         Reset();
         ShowStartUI();
@@ -58,11 +58,8 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        score.text = ScoreManager.Instance.Score.ToString();
-        bestScore.text = ScoreManager.Instance.HighScore.ToString();
+        //bestScore.text = ScoreManager.Instance.HighScore.ToString();
         //coinText.text = CoinManager.Instance.Coins.ToString();
-        if (playerController != null)
-            strokeRemainingText.text = playerController.hitcount.ToString();
 
         if (settingsUI.activeSelf)
         {
