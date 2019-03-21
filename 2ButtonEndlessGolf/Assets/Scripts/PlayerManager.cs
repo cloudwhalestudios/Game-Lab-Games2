@@ -7,6 +7,9 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    public static event Action NewPlayerAdded = delegate { };
+    public static event Action PlayerWasRemoved = delegate { };
+
     public static PlayerManager Instance { get; private set; }
 
     [Serializable]
@@ -99,13 +102,20 @@ public class PlayerManager : MonoBehaviour
 
         public void DestroyPlayer()
         {
+            Destroy (UI);
             Destroy (PGameObject);
         }
     }
 
     [Header("Players")]
     [SerializeField] private int maxPlayers = 4;
-    [SerializeField] private List<Color> colors;
+    [SerializeField] private List<Color> colors = new List<Color>
+    {
+        GetRGBColor(10f, 223f, 222f),  // Blue p1
+        GetRGBColor(252f, 121f, 17f),  // Orange p2
+        GetRGBColor(50f, 205f, 51f),   // Green p3
+        GetRGBColor(237f, 4f, 121f)   // Pink p4
+    };
     [SerializeField] private int currentPlayerID;
     [SerializeField] private List<Player> players;
     [SerializeField] private int remaningRetries;
@@ -133,8 +143,17 @@ public class PlayerManager : MonoBehaviour
     public int CurrentPlayerID { get; private set; }
     Player GetCurrentPlayer() => GetPlayer(currentPlayerID);
     Player GetPlayer(int id) => players.Find(x => x.ID == currentPlayerID);
+    private bool IsInputFromPlayer(int id, KeyCode key) => IsInputFromPlayer(GetPlayer(id), key);
     bool IsInputFromCurrentPlayer(KeyCode pressedKey) => IsInputFromPlayer(GetCurrentPlayer(), pressedKey);
     bool IsInputFromPlayer(Player player, KeyCode pressedKey) => (player.Input.PrimaryKey == pressedKey || player.Input.SecondaryKey == pressedKey);
+    bool IsPlayerInput(KeyCode pressedKey) => playerKeyBindings.ContainsKey(pressedKey);
+    bool IsPlayerOneInput(KeyCode pressedKey)
+    {
+        var player = playerKeyBindings[pressedKey];
+        var playerIndex = players.FindIndex(x => x == player);
+        return playerIndex == 0;
+    }
+
 
     void Awake()
     {
@@ -147,15 +166,9 @@ public class PlayerManager : MonoBehaviour
         {
             DestroyImmediate(this);
         }
-
-        colors = new List<Color>();
-        colors.Add(GetRGBColor(10f, 223f, 222f));  // Blue p1
-        colors.Add(GetRGBColor(252f, 121f, 17f));  // Orange p2
-        colors.Add(GetRGBColor(50f, 205f, 51f));   // Green p3
-        colors.Add(GetRGBColor(237f, 4f, 121f));   // Pink p4
     }
 
-    Color GetRGBColor(float r, float g, float b)
+    static Color GetRGBColor(float r, float g, float b)
     {
         return new Color(r / 255f, g / 255f, b / 255f);
     }
@@ -163,6 +176,7 @@ public class PlayerManager : MonoBehaviour
     void OnDestroy()
     {
         if (Instance == this) { Instance = null; }
+        StopAllCoroutines();
     }
 
     private void Start()
@@ -178,12 +192,14 @@ public class PlayerManager : MonoBehaviour
             CheckForNewPlayer();
         }
     }
-
-    #region Listeners
+    
     private void OnEnable()
     {
-        InputController.Game.Primary += OnPrimary;
-        InputController.Game.Secondary += OnSecondary;
+        InputController.Game.Primary += OnPrimaryGame;
+        InputController.Game.Secondary += OnSecondaryGame;
+
+        InputController.Menu.Primary += OnPrimaryMenu;
+        InputController.Menu.Secondary += OnSecondaryMenu;
 
         GameManager.TurnStateChanged += OnTurnStateChanged;
         GameManager.GameStateChanged += OnGameStateChanged;
@@ -191,15 +207,66 @@ public class PlayerManager : MonoBehaviour
     }
     private void OnDisable()
     {
-        InputController.Game.Primary -= OnPrimary;
-        InputController.Game.Secondary -= OnSecondary;
-
+        InputController.Game.Primary -= OnPrimaryGame;
+        InputController.Game.Secondary -= OnSecondaryGame;
+        
+        InputController.Menu.Primary -= OnPrimaryMenu;
+        InputController.Menu.Secondary -= OnSecondaryMenu;
+        
         GameManager.TurnStateChanged -= OnTurnStateChanged;
         GameManager.GameStateChanged -= OnGameStateChanged;
-        GameManager.MapBoundsExit -= OnMapBoundsExit;
-
+        GameManager.MapBoundsExit -= OnMapBoundsExit;   
     }
 
+    #region Input Listeners
+    void OnPrimaryGame(KeyCode key)
+    {
+        if (!IsInputFromCurrentPlayer(key)) return;
+        GameManager.Instance.AdvanceTurn(true);
+    }
+
+    void OnSecondaryGame(KeyCode key)
+    {
+        // Open Pause Menu
+    }
+
+    private void OnPrimaryMenu(KeyCode key)
+    {
+        MenuManager.Instance.SelectButton();
+    }
+
+    private void OnSecondaryMenu(KeyCode key)
+    {
+        var isPlayerOne = IsPlayerOneInput(key);
+        var isCurrentPlayer = IsInputFromCurrentPlayer(key);
+
+        switch (GameManager.Instance.GameState)
+        {
+            case GameState.MainMenu:
+                RemovePlayer(playerKeyBindings[key].ID);
+                break;
+            case GameState.Paused:
+                // Allow undo for current player
+                if (isCurrentPlayer)
+                {
+                    StartUndo();
+                }
+                break;
+
+            case GameState.LevelSelect:
+            case GameState.GameOver:
+                if (isPlayerOne)
+                {
+                    // Select stuff
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    #endregion
+
+    #region Game Listeners
     private void OnGameStateChanged(GameState newState, GameState oldState)
     {
         switch (newState)
@@ -266,26 +333,12 @@ public class PlayerManager : MonoBehaviour
                 break;
         }
     }
-
-    void OnPrimary(KeyCode keycode)
-    {
-        if (!IsInputFromCurrentPlayer(keycode)) return;
-        GameManager.Instance.AdvanceTurn(true);
-    }
-
-    void OnSecondary(KeyCode keycode)
-    {
-        // Open Pause Menu
-        StartUndo();
-    }
     #endregion
 
     #region Player Management
     private void CheckForNewPlayer()
     {
         var key = GetKeyInput();
-        
-        
 
         if (key != KeyCode.None)
         {
@@ -357,6 +410,8 @@ public class PlayerManager : MonoBehaviour
         playerKeyBindings.Add(secondary, newPlayer);
 
         UpdatePlayerPlaceholder();
+
+        NewPlayerAdded();
     }
 
     private void UpdatePlayerPlaceholder()
@@ -390,6 +445,8 @@ public class PlayerManager : MonoBehaviour
         player.DestroyPlayer();
 
         UpdatePlayerPlaceholder();
+
+        PlayerWasRemoved();
         return true;
     }
     #endregion
@@ -451,7 +508,7 @@ public class PlayerManager : MonoBehaviour
         if (isUndoing) return;
         undoTargetState = state;
     }
-    void StartUndo()
+    public void StartUndo()
     {
         isUndoing = true;
         StartCoroutine(Undo());

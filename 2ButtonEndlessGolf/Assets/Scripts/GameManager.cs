@@ -2,8 +2,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 public enum GameState
 {
@@ -23,12 +25,6 @@ public enum TurnState
     Power,
     Firing,
     End
-}
-
-[Serializable]
-public class Level : ScriptableObject
-{
-    public Scene scene;
 }
 
 public class GameManager : MonoBehaviour
@@ -103,7 +99,10 @@ public class GameManager : MonoBehaviour
     public float checkPointBelow;
     public GameObject mapBounds;
 
-    [Header("Level Config")]
+    [Header("Scene Management")]
+    public Object mainMenuScene;
+    public Object levelSelect;
+    public List<LevelController> levelPrefabs;
 
     [Header("Player Config")]
     public GameObject playerPrefab;
@@ -135,7 +134,6 @@ public class GameManager : MonoBehaviour
             DestroyImmediate(this);
         }
     }
-
     void OnDestroy()
     {
         if (Instance == this)
@@ -196,34 +194,26 @@ public class GameManager : MonoBehaviour
     public void StartMainMenu()
     {
         GameState = GameState.MainMenu;
+
         // StartUp Scene
-    }
-
-    public void UpdateScene()
-    {
-        switch (GameState)
-        {
-            case GameState.MainMenu:
-            case GameState.LevelSelect:
-                SceneManager.LoadScene((int)GameState);
-                break;
-        }
-    }
-
-    public void OpenLevel(int levelIndex)
-    {
-
+        //SceneManager.LoadScene(mainMenuScene.name);
     }
 
     public void StartLevelSelect ()
     {
         GameState = GameState.LevelSelect;
+
+        // LevelSelect Scene    
+        SceneManager.LoadScene(levelSelect.name);
     }
 
     // A new game official starts
-    public void StartGame()
+    public void StartGame(LevelController level)
     {
         GameState = GameState.Playing;
+
+        SceneManager.LoadScene(level.scene.name);
+
         if (SoundManager.Instance.backgroundGame != null)
         {
             SoundManager.Instance.PlayMusic(SoundManager.Instance.backgroundGame);
@@ -238,24 +228,14 @@ public class GameManager : MonoBehaviour
     // Called when the player died
     public void GameOver()
     {
-        if (SoundManager.Instance.backgroundGame != null)
-        {
-            SoundManager.Instance.StopMusic();
-        }
-
-        SoundManager.Instance.PlaySound(SoundManager.Instance.outOfBounds, true);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.win, true);
         GameState = GameState.GameOver;
-        GameCount++;
-        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().enabled = false;
-
-        // Add other game over actions here if necessary
     }
 
     // Start a new game
     public void RestartGame(float delay = 0)
     {
         isRestart = true;
-        _gameCount++;
         StartCoroutine(CRRestartGame(delay));
     }
 
@@ -268,5 +248,17 @@ public class GameManager : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
         MapBoundsExit(collision);
+    }
+
+    public void Quit()
+    {
+        // Exit Game
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#elif UNITY_WEBPLAYER
+        Application.OpenURL("google.com");
+#else
+        Application.Quit();
+#endif
     }
 }

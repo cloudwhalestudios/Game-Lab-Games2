@@ -220,6 +220,36 @@ namespace SgLib
             }
         }
 
+        public void ToggleMute()
+        {
+            if (IsMusicOff())
+            {
+                // Turn music ON
+                SetMusicOn(true);
+                if (musicState == PlayingState.Paused)
+                {
+                    ResumeMusic();
+                }
+
+                SetSoundOn(true);
+            }
+            else
+            {
+                // Turn music OFF
+                SetMusicOn(false);
+                if (musicState == PlayingState.Playing)
+                {
+                    PauseMusic();
+                }
+                SetSoundOn(false);
+            }
+        }
+
+        public bool IsMuted()
+        {
+            return IsMusicOff() && IsSoundOff();
+        }
+
         public bool IsSoundOff()
         {
             return PlayerPrefs.GetInt(SOUND_PREF_KEY, SOUND_ON) == SOUND_OFF;

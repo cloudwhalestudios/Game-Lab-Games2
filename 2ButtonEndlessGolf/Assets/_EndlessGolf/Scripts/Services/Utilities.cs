@@ -68,18 +68,13 @@ namespace SgLib
             Application.OpenURL(AppInfo.Instance.TWITTER_LINK);
         }
 
-        public static void ContactUs()
+        /*public static void ContactUs()
         {
             string email = AppInfo.Instance.SUPPORT_EMAIL;
             string subject = EscapeURL(AppInfo.Instance.APP_NAME + " [" + Application.version + "] Support");
             string body = EscapeURL("");
             Application.OpenURL("mailto:" + email + "?subject=" + subject + "&body=" + body);
-        }
-
-        public static string EscapeURL(string url)
-        {
-            return WWW.EscapeURL(url).Replace("+", "%20");
-        }
+        }*/
 
         public static int[] GenerateShuffleIndices(int length)
         {
