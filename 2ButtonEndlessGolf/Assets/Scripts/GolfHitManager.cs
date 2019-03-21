@@ -71,7 +71,7 @@ public class GolfHitManager : MonoBehaviour
         powerIndicator.pivot = new Vector2(0.5f, 0);
     }
 
-    void ResetValues()
+    public void ResetValues()
     {
         CurrentAnglePercentage = 0f;
         CurrentPowerPercentage = 0f;
@@ -132,7 +132,7 @@ public class GolfHitManager : MonoBehaviour
 
     IEnumerator BouncePower()
     {
-        print("Bouncing power!");
+        //print("Bouncing power!");
         while(true)
         {
             yield return new WaitForSeconds(stepInterval);
@@ -143,7 +143,7 @@ public class GolfHitManager : MonoBehaviour
 
     IEnumerator BounceAngle()
     {
-        print("Bouncing angle!");
+        //print("Bouncing angle!");
         while (true)
         {
             yield return new WaitForSeconds(stepInterval);

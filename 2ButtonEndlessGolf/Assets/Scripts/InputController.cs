@@ -47,7 +47,7 @@ public abstract class InputController : MonoBehaviour
                     ActiveControls = Game;
                     break;
                 case InputMode.Menu:
-                    ActiveControls = Pause;
+                    ActiveControls = Menu;
                     break;
                 case InputMode.Other:
                     ActiveControls = Other;
@@ -103,7 +103,7 @@ public abstract class InputController : MonoBehaviour
     [SerializeField] private KeyCode secondaryKey;
 
     public static ModeControls Game        = new ModeControls(InputMode.Game);
-    public static ModeControls Pause       = new ModeControls(InputMode.Menu);
+    public static ModeControls Menu       = new ModeControls(InputMode.Menu);
     public static ModeControls Other       = new ModeControls(InputMode.Other);
 
     private static ModeControls ActiveControls;

@@ -24,7 +24,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1119651808339592399}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -43,13 +43,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58d49954360440e45bf7a62a76810b52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxPlayers: 4
+  colors: []
   currentPlayerID: 0
   players: []
-  lastPosition: {x: 0, y: 0, z: 0}
+  remaningRetries: 0
+  directionToGoal: {x: 0, y: 0}
+  flipAngle: 0
   selectedAngle: {x: 0, y: 0, z: 0, w: 0}
   selectedForce: 0
-  flipAngle: 0
-  directionToGoal: {x: 0, y: 0}
+  availableRetrys: 0
+  lastPosition: {x: 0, y: 0, z: 0}
   isUndoing: 0
   undoTargetState: 0
   waitingForNextInput: 0

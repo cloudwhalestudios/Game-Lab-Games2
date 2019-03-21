@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform checkGround;
     
     [SerializeField] private TrailRenderer trailRender;
-    [SerializeField] private float timeTrail;
+    [SerializeField] private SpriteRenderer spriteRenderer;
 
     [SerializeField] private Vector3 currentPlayerPosition;
     [SerializeField] private bool _isGrounded;
@@ -33,32 +33,37 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int score;
     public int availableUndos;
 
-    void OnEnable()
+    public void Init(int id)
     {
-        trailRender = transform.GetComponent<TrailRenderer>();
-        timeTrail = trailRender.time;
-    }
+        PlayerID = id;
+        startTime = Time.time;
 
-    private void Start()
-    {
         // Get components
         Rb = GetComponent<Rigidbody2D>();
+        Rb.isKinematic = true;
         cCollider = GetComponent<CircleCollider2D>();
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
+        if (trailRender == null)
+        {
+            trailRender = GetComponent<TrailRenderer>();
+        }
 
         // Apply game manager configuration
-        trailRender.material.color = GameManager.Instance.isNotMoving;
         cCollider.sharedMaterial.friction = GameManager.Instance.friction;
         cCollider.sharedMaterial.bounciness = GameManager.Instance.bounciness;
         availableUndos = GameManager.Instance.availableUndosPerLevel;
 
         // Move the transform infront of other sprites (z-axis)
         transform.position = new Vector3(transform.position.x, transform.position.y, 5);
+    }
 
-     }
-
-    public void Init(int id)
+    public void SetColor(Color color)
     {
-        PlayerID = id;
+        trailRender.material.color = color;
+        spriteRenderer.color = color;
     }
 
     void Update()
@@ -72,32 +77,16 @@ public class PlayerController : MonoBehaviour
 
     void CheckObjectMoving()
     {
-        if (Time.time > startTime)
+        if (Time.time > startTime && IsMoving)
         {
             if (Mathf.Abs(currentPlayerPosition.magnitude - transform.position.magnitude) < 0.0008f)
             {
+                Debug.Log(PlayerID + ": No Longer Moving");
                 IsMoving = false;
                 Rb.velocity = Vector2.zero;
             }
-            else
-            {
-                IsMoving = true;
-            }
-
             currentPlayerPosition = transform.position;
             startTime = Time.time + GameManager.Instance.checkRate;
         }
-    }
-
-    void DisableTrail()
-    {
-        StartCoroutine(DisableTrail_IEnum());
-    }
-
-    IEnumerator DisableTrail_IEnum()
-    {
-        trailRender.time = 0;
-        yield return new WaitForSeconds(timeTrail + 0.03f);
-        trailRender.time = timeTrail;
     }
 }

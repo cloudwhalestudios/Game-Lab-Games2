@@ -6,5 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_EndlessGolf/Scenes/Main.unity
-    guid: 7ced3701372d53c40a240979deb00914
+    path: Assets/Scenes/StartUp.unity
+    guid: a2813d827d909e84e9505f1f59d10c78
+  m_configObjects: {}

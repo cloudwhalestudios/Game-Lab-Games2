@@ -47,34 +47,26 @@ MonoBehaviour:
   _turnState: 0
   targetFrameRate: 60
   autoInterval: 0.5
+  endOfTurnTime: 2
   goalObject: {fileID: 0}
   checkPointBelow: 0.1
-  playerPrefab: {fileID: 0}
-  isNotMoving: {r: 0, g: 0.09174347, b: 1, a: 1}
-  isMoving: {r: 1, g: 0, b: 0, a: 1}
+  mapBounds: {fileID: 0}
+  playerPrefab: {fileID: 7773887049005501778, guid: ed0f1ad7e79bb664586b3640bd76dc2b,
+    type: 3}
+  playerUIContainer: {fileID: 0}
+  playerUIPrefab: {fileID: 205615670494183036, guid: be06992d74bf59643ae74a3462bc0330,
+    type: 3}
   force: 200
   checkRate: 0.2
-  checkGround: {fileID: 0}
   checkGroundRadius: 0.1
   groundLayer:
     serializedVersion: 2
     m_Bits: 1024
   friction: 0.03
   bounciness: 0.2
-  availableUndosPerMap: 3
-  numberOfStroke: 5
-  strokeAdd: 3
-  minWindForce: 0
-  maxWindForce: 5
-  bodyXscale: 0.2
-  bodyYscale: 0.2
-  windForce: 0
-  coinFrequency: 1
-  smoothTime: 2
-  distanceBottoCam: 15
-  niceHit: 0
+  availableUndosPerLevel: 3
+  availableRetriesPerShot: 2
   minFallingSpeed: -20
   maxFallingSpeed: 5
   ratioWithWindForce: 1
-  playerController: {fileID: 0}
   fallingEffect: {fileID: 0}

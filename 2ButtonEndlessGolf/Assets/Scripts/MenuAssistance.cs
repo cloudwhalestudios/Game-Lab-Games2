@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
-
-
 
 public class MenuAssistance : MonoBehaviour
 {
@@ -24,25 +21,25 @@ public class MenuAssistance : MonoBehaviour
 
     void Start()
     {
-        InputController.Pause.Primary += OnPrimaryPause;
-        InputController.Pause.Secondary += OnSecondaryPause;
+        InputController.Menu.Primary += OnPrimaryMenu;
+        InputController.Menu.Secondary += OnSecondaryMenu;
     }
 
     void OnDestroy()
     {
-        InputController.Pause.Primary -= OnPrimaryPause;
-        InputController.Pause.Secondary -= OnSecondaryPause;
+        InputController.Menu.Primary -= OnPrimaryMenu;
+        InputController.Menu.Secondary -= OnSecondaryMenu;
 
         StopAllCoroutines();
     }
 
-    void OnPrimaryPause(KeyCode key)
+    void OnPrimaryMenu(KeyCode key)
     {
         // perform select button action
         buttons[selectedButtonIndex].onClick.Invoke();
     }
 
-    void OnSecondaryPause(KeyCode key)
+    void OnSecondaryMenu(KeyCode key)
     {
         Quit();
     }
@@ -85,8 +82,7 @@ public class MenuAssistance : MonoBehaviour
         pauseMenu.SetActive(true);
         Time.timeScale = 0;
 
-        InputController.ActiveInputMode = InputController.InputMode.Menu;
-
+        
         menuSelector = StartCoroutine(MenuSelection());
     }
 
@@ -94,8 +90,6 @@ public class MenuAssistance : MonoBehaviour
     {
         pauseMenu.SetActive(false);
         Time.timeScale = 1;
-
-        InputController.ActiveInputMode = InputController.InputMode.Game;
 
         if (menuSelector != null)
         {

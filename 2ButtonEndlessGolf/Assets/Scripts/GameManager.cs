@@ -7,7 +7,8 @@ using UnityEngine.SceneManagement;
 
 public enum GameState
 {
-    Prepare,
+    MainMenu,
+    LevelSelect,
     Playing,
     Paused,
     PreGameOver,
@@ -22,6 +23,12 @@ public enum TurnState
     Power,
     Firing,
     End
+}
+
+[Serializable]
+public class Level : ScriptableObject
+{
+    public Scene scene;
 }
 
 public class GameManager : MonoBehaviour
@@ -71,7 +78,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    [SerializeField] private GameState _gameState = GameState.Prepare;
+    [SerializeField] private GameState _gameState;
 
     [SerializeField] private TurnState _turnState = TurnState.NotPlaying;
 
@@ -91,15 +98,19 @@ public class GameManager : MonoBehaviour
     public float autoInterval = 1f;
     public float endOfTurnTime = 2f;
 
-    [Header("Map Config")]
+    [Header("Current Level Config")]
     public GameObject goalObject;
     public float checkPointBelow;
     public GameObject mapBounds;
 
+    [Header("Level Config")]
+
     [Header("Player Config")]
     public GameObject playerPrefab;
-    public Color isNotMoving;
-    public Color isMoving;
+    public RectTransform playerUIContainer;
+    public GameObject playerUIPrefab;
+    public GameObject pressToJoinPlaceholder;
+    public NewPlayerDialog newPlayerDialog;
     public float force = 200;
     public float checkRate = 0.2f;
 
@@ -112,29 +123,17 @@ public class GameManager : MonoBehaviour
     public int availableUndosPerLevel = 3;
     public int availableRetriesPerShot = 3;
 
-    [Header("Falling Effect")]
-    public float minFallingSpeed = -20;
-    public float maxFallingSpeed = 5;
-    public float ratioWithWindForce = 1;
-    public ParticleSystem fallingEffect;    
-
-    [HideInInspector]
-    public ParticleSystem.VelocityOverLifetimeModule velocity;
-
-    private float curWindForce;
-
     void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(this);
         }
         else
         {
-            DestroyImmediate(Instance.gameObject);
-            Instance = this;
+            DestroyImmediate(this);
         }
-        velocity = fallingEffect.velocityOverLifetime;
     }
 
     void OnDestroy()
@@ -150,28 +149,7 @@ public class GameManager : MonoBehaviour
     {
         // Initial setup
         Application.targetFrameRate = targetFrameRate;
-
-        PrepareGame();
-        velocity.y = new ParticleSystem.MinMaxCurve(minFallingSpeed, maxFallingSpeed);
-    }
-
-    void Update()
-    {
-        UpdateEffect();
-    }
-
-    public void UpdateEffect()
-    {
-        /*if (curWindForce != windForce)
-        {
-            float value = -(windForce * ratioWithWindForce);
-            if (value == 0)
-                velocity.y = new ParticleSystem.MinMaxCurve(minFallingSpeed, minFallingSpeed / 2);
-            else
-                velocity.y = new ParticleSystem.MinMaxCurve(minFallingSpeed, maxFallingSpeed);
-            velocity.x = new ParticleSystem.MinMaxCurve(value, value);
-            curWindForce = windForce;
-        }*/
+        StartMainMenu();
     }
 
     public void AdvanceTurn(bool playerInput = false)
@@ -214,43 +192,58 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Listens to the event when player dies and call GameOver
-    void PlayerController_PlayerDied()
+    // Make initial setup and preparations before the game can be played
+    public void StartMainMenu()
     {
-        GameOver();
+        GameState = GameState.MainMenu;
+        // StartUp Scene
     }
 
-    // Make initial setup and preparations before the game can be played
-    public void PrepareGame()
+    public void UpdateScene()
     {
-        GameState = GameState.Prepare;
-
-        if (isRestart)
+        switch (GameState)
         {
-            isRestart = false;
-            StartGame();
+            case GameState.MainMenu:
+            case GameState.LevelSelect:
+                SceneManager.LoadScene((int)GameState);
+                break;
         }
+    }
+
+    public void OpenLevel(int levelIndex)
+    {
+
+    }
+
+    public void StartLevelSelect ()
+    {
+        GameState = GameState.LevelSelect;
     }
 
     // A new game official starts
     public void StartGame()
     {
         GameState = GameState.Playing;
-        if (SoundManager.Instance.background != null)
+        if (SoundManager.Instance.backgroundGame != null)
         {
-            SoundManager.Instance.PlayMusic(SoundManager.Instance.background);
+            SoundManager.Instance.PlayMusic(SoundManager.Instance.backgroundGame);
         }
+    }
+
+    public void StartLevel()
+    {
+        TurnState = TurnState.Start;
     }
 
     // Called when the player died
     public void GameOver()
     {
-        if (SoundManager.Instance.background != null)
+        if (SoundManager.Instance.backgroundGame != null)
         {
             SoundManager.Instance.StopMusic();
         }
 
-        SoundManager.Instance.PlaySound(SoundManager.Instance.gameOver, true);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.outOfBounds, true);
         GameState = GameState.GameOver;
         GameCount++;
         GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().enabled = false;
