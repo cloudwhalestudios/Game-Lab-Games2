@@ -409,6 +409,11 @@ PrefabInstance:
       propertyPath: m_Color.a
       value: 0.09019608
       objectReference: {fileID: 0}
+    - target: {fileID: 7437404550573773885, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_FillCenter
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7699668156743507491, guid: 4e77228c5bbbcb944b2b77fe5acab718,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -455,6 +460,11 @@ PrefabInstance:
       propertyPath: m_Color.a
       value: 0.09019608
       objectReference: {fileID: 0}
+    - target: {fileID: 5236472033900201078, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_FillCenter
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4205557751534905149, guid: 4e77228c5bbbcb944b2b77fe5acab718,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -495,6 +505,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Color.a
       value: 0.09019608
+      objectReference: {fileID: 0}
+    - target: {fileID: 7605443969665228093, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_FillCenter
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 707266929387993542, guid: 4e77228c5bbbcb944b2b77fe5acab718,
         type: 3}
@@ -911,12 +926,75 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2d7bb29a268ed6a41923cff64e19325e, type: 3}
+--- !u!1 &1606872905036148031 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1606872905036148031, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+    type: 3}
+  m_PrefabInstance: {fileID: 1261607171}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1606872905036148032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1606872905036148031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1573420865, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0.33962262, g: 0.33962262, b: 0.33962262, a: 0.3764706}
+  m_EffectDistance: {x: 5, y: -5}
+  m_UseGraphicAlpha: 1
+--- !u!1 &4015822121142207342 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4015822121142207342, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+    type: 3}
+  m_PrefabInstance: {fileID: 1261607171}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4015822121142207343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4015822121142207342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1573420865, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0.33962262, g: 0.33962262, b: 0.33962262, a: 0.3764706}
+  m_EffectDistance: {x: 5, y: -5}
+  m_UseGraphicAlpha: 1
 --- !u!224 &5326190044638828031 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5326190044638828031, guid: 4e77228c5bbbcb944b2b77fe5acab718,
     type: 3}
   m_PrefabInstance: {fileID: 1261607171}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6021263696932202478 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6021263696932202478, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+    type: 3}
+  m_PrefabInstance: {fileID: 1261607171}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6021263696932202479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6021263696932202478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1573420865, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0.33962262, g: 0.33962262, b: 0.33962262, a: 0.3764706}
+  m_EffectDistance: {x: 5, y: -5}
+  m_UseGraphicAlpha: 1
 --- !u!114 &7809690263764905067 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7809690263764905067, guid: 4e77228c5bbbcb944b2b77fe5acab718,

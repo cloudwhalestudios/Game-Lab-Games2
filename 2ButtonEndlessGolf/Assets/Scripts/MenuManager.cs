@@ -89,7 +89,7 @@ public class MenuManager : MonoBehaviour
             selectedButton = buttons[selectedButtonIndex];
             defaultStateSprite = selectedButton.image.sprite;
             defaultColor = selectedButton.image.color;
-            Debug.Log(selectedButton.image);
+            //Debug.Log(selectedButton.image);
 
             IndicateMenuButton(selectedButton);
             

@@ -102,20 +102,22 @@ public abstract class InputController : MonoBehaviour
     [SerializeField] private KeyCode primaryKey;
     [SerializeField] private KeyCode secondaryKey;
 
-    public static ModeControls Game        = new ModeControls(InputMode.Game);
-    public static ModeControls Menu       = new ModeControls(InputMode.Menu);
-    public static ModeControls Other       = new ModeControls(InputMode.Other);
+    public static ModeControls Game     = new ModeControls(InputMode.Game);
+    public static ModeControls Menu     = new ModeControls(InputMode.Menu);
+    public static ModeControls Other    = new ModeControls(InputMode.Other);
 
     private static ModeControls ActiveControls;
 
     public abstract void Init(KeyCode primary, KeyCode secondary, int id);
     protected static void OnPrimary(KeyCode pressedKey)
     {
+        Debug.Log("Primary");
         ActiveControls.InvokePrimary(pressedKey);
     }
 
     protected static void OnSecondary(KeyCode pressedKey)
     {
+        Debug.Log("Secondary");
         ActiveControls.InvokeSecondary(pressedKey);
     }
 }

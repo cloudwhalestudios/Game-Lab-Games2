@@ -194,6 +194,7 @@ public class GameManager : MonoBehaviour
     public void StartMainMenu()
     {
         GameState = GameState.MainMenu;
+        InputController.ActiveInputMode = InputController.InputMode.Menu;
 
         // StartUp Scene
         //SceneManager.LoadScene(mainMenuScene.name);
@@ -202,6 +203,7 @@ public class GameManager : MonoBehaviour
     public void StartLevelSelect ()
     {
         GameState = GameState.LevelSelect;
+        InputController.ActiveInputMode = InputController.InputMode.Menu;
 
         // LevelSelect Scene    
         SceneManager.LoadScene(levelSelect.name);
@@ -211,6 +213,7 @@ public class GameManager : MonoBehaviour
     public void StartGame(LevelController level)
     {
         GameState = GameState.Playing;
+        InputController.ActiveInputMode = InputController.InputMode.Game;
 
         SceneManager.LoadScene(level.scene.name);
 
@@ -218,6 +221,7 @@ public class GameManager : MonoBehaviour
         {
             SoundManager.Instance.PlayMusic(SoundManager.Instance.backgroundGame);
         }
+        StartLevel();
     }
 
     public void StartLevel()

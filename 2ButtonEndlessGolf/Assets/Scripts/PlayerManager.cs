@@ -232,6 +232,7 @@ public class PlayerManager : MonoBehaviour
 
     private void OnPrimaryMenu(KeyCode key)
     {
+        Debug.Log("Primary Menu");
         MenuManager.Instance.SelectButton();
     }
 
@@ -272,13 +273,10 @@ public class PlayerManager : MonoBehaviour
         switch (newState)
         {
             case GameState.MainMenu:
-                InputController.ActiveInputMode = InputController.InputMode.Menu;
 
                 break;
             case GameState.Playing:
-                InputController.ActiveInputMode = InputController.InputMode.Game;
                 ActivatePlayerObjects();
-                GameManager.Instance.StartLevel();
                 break;
             default:
                 ActivatePlayerObjects(false);

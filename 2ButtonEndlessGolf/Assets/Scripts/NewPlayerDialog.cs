@@ -19,7 +19,6 @@ public class NewPlayerDialog : MonoBehaviour
         primaryKeyText.text = primaryKey;
 
         gameObject.SetActive(true);
-
     }
 
     public void HideDialog()

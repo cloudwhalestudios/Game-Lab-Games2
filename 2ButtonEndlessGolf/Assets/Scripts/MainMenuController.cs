@@ -11,6 +11,8 @@ public class MainMenuController : MenuController
     public Sprite SoundOn;
     public Sprite SoundOff;
 
+    bool started = false;
+
     public void Start()
     {
         MenuManager.Instance.SetActiveMenu(this);
@@ -28,6 +30,8 @@ public class MainMenuController : MenuController
 
     private void PlayerManager_NewPlayerAdded()
     {
+        if (started) return;
+        started = true;
         MenuManager.Instance.StartMoving();
     }
 
