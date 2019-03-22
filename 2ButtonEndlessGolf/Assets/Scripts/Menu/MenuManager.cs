@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SgLib;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,9 @@ public class MenuManager : MonoBehaviour
     [SerializeField, ReadOnly] private List<Button> buttons;
 
     Coroutine menuSelector;
+
+    Sprite lastDefaultStateSprite;
+    Color lastDefaultColor;
 
     void Awake()
     {
@@ -45,7 +49,7 @@ public class MenuManager : MonoBehaviour
         if (activeMenuController?.menuContainer != null)
         {
             activeMenuController.menuContainer.SetActive(true);
-            StartMoving(startMoving);
+            StartIndicating(startMoving);
         }
     }
     public void HideMenu()
@@ -53,13 +57,13 @@ public class MenuManager : MonoBehaviour
         if (activeMenuController?.menuContainer != null)
         {
             activeMenuController.menuContainer.SetActive(false);
-            StartMoving(false);
+            StartIndicating(false);
         }
     }
 
-    public void StartMoving(bool start = true)
+    public void StartIndicating(bool indicate = true)
     {
-        if (start)
+        if (indicate)
         {
             activeMenuController.menuSelectIndicator.gameObject.SetActive(true);
             menuSelector = StartCoroutine(MenuSelection());
@@ -69,11 +73,16 @@ public class MenuManager : MonoBehaviour
             activeMenuController.menuSelectIndicator.gameObject.SetActive(false);
             StopCoroutine(menuSelector);
             menuSelector = null;
+            HighlightButton(buttons[selectedButtonIndex], true);
         }
     }
 
     public void SelectButton()
     {
+        if (SoundManager.Instance?.button != null)
+        {
+            SoundManager.Instance.PlaySound(SoundManager.Instance.button);
+        }
         buttons[selectedButtonIndex].onClick.Invoke();
     }
 
@@ -82,37 +91,44 @@ public class MenuManager : MonoBehaviour
         selectedButtonIndex = activeMenuController.startingIndex;
         yield return null;
         Button selectedButton;
-        Sprite defaultStateSprite;
-        Color defaultColor;
+        
         while (true)
         {
             selectedButton = buttons[selectedButtonIndex];
-            defaultStateSprite = selectedButton.image.sprite;
-            defaultColor = selectedButton.image.color;
-            //Debug.Log(selectedButton.image);
 
-            IndicateMenuButton(selectedButton);
-            
-            // Apply Highlight
-            selectedButton.image.sprite = selectedButton.spriteState.highlightedSprite;
-            selectedButton.image.color = Color.white;
+            // Indicate and Highlight
+            IndicateButton(selectedButton);
+            HighlightButton(selectedButton);
 
             yield return new WaitForSecondsRealtime(GameManager.Instance.autoInterval);
 
             // Re-apply default sprite
-            selectedButton.image.sprite = defaultStateSprite;
-            selectedButton.image.color = defaultColor;
-
+            HighlightButton(selectedButton, true);
 
             selectedButtonIndex = (selectedButtonIndex + 1) % buttons.Count;
         }
     }
 
-    void IndicateMenuButton(Button btn)
+    void IndicateButton(Button btn)
     {
         var btnRect = btn.GetComponent<RectTransform>();
         var pos = new Vector2(btnRect.localPosition.x, btnRect.localPosition.y);
 
         activeMenuController.menuSelectIndicator.anchoredPosition = pos + activeMenuController.offset;
+    }
+
+    void HighlightButton(Button btn, bool revert = false)
+    {
+        if (revert)
+        {
+            if (lastDefaultStateSprite != null) btn.image.sprite = lastDefaultStateSprite;
+            if (lastDefaultColor != null) btn.image.color = lastDefaultColor;
+            return;
+        }
+
+        lastDefaultStateSprite = btn.image.sprite;
+        lastDefaultColor = btn.image.color;
+        btn.image.sprite = btn.spriteState.highlightedSprite;
+        btn.image.color = Color.white;
     }
 }

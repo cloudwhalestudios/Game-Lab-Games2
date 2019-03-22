@@ -99,13 +99,13 @@ public abstract class InputController : MonoBehaviour
     public abstract void Init(KeyCode primary, KeyCode secondary, int id);
     protected static void OnPrimary(KeyCode pressedKey)
     {
-        Debug.Log("Primary");
+        //Debug.Log("Primary");
         ActiveControls.InvokePrimary(pressedKey);
     }
 
     protected static void OnSecondary(KeyCode pressedKey)
     {
-        Debug.Log("Secondary");
+        //Debug.Log("Secondary");
         ActiveControls.InvokeSecondary(pressedKey);
     }
 

@@ -7,8 +7,8 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    public static event Action NewPlayerAdded = delegate { };
-    public static event Action PlayerWasRemoved = delegate { };
+    public static event Action<int> NewPlayerAdded = delegate { };
+    public static event Action<int> PlayerWasRemoved = delegate { };
 
     public static PlayerManager Instance { get; private set; }
 
@@ -209,8 +209,8 @@ public class PlayerManager : MonoBehaviour
     {
         if (!remove)
         {
-            //InputController.Game.Primary += OnPrimaryGame;
-            //InputController.Game.Secondary += OnSecondaryGame;
+            InputController.Game.Primary += OnPrimaryGame;
+            InputController.Game.Secondary += OnSecondaryGame;
 
             InputController.Menu.Primary += OnPrimaryMenu;
             InputController.Menu.Secondary += OnSecondaryMenu;
@@ -221,8 +221,8 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
-            //InputController.Game.Primary -= OnPrimaryGame;
-            //InputController.Game.Secondary -= OnSecondaryGame;
+            InputController.Game.Primary -= OnPrimaryGame;
+            InputController.Game.Secondary -= OnSecondaryGame;
 
             InputController.Menu.Primary -= OnPrimaryMenu;
             InputController.Menu.Secondary -= OnSecondaryMenu;
@@ -253,7 +253,7 @@ public class PlayerManager : MonoBehaviour
 
     private void OnPrimaryMenu(KeyCode key)
     {
-        Debug.Log("Primary Menu");
+        //Debug.Log("Primary Menu");
         MenuManager.Instance.SelectButton();
     }
 
@@ -439,7 +439,7 @@ public class PlayerManager : MonoBehaviour
 
         //RefreshHandles();
 
-        NewPlayerAdded();
+        NewPlayerAdded(players.Count);
     }
 
     private void UpdatePlayerPlaceholder()
@@ -474,7 +474,7 @@ public class PlayerManager : MonoBehaviour
 
         UpdatePlayerPlaceholder();
 
-        PlayerWasRemoved();
+        PlayerWasRemoved(players.Count);
         return true;
     }
     #endregion

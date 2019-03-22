@@ -11,29 +11,35 @@ public class MainMenuController : MenuController
     public Sprite SoundOn;
     public Sprite SoundOff;
 
-    bool started = false;
-
     public void Start()
     {
         MenuManager.Instance.SetActiveMenu(this);
         menuSelectIndicator.gameObject.SetActive(false);
+        UpdateSoundIcon();
     }
 
     void OnEnable()
     {
         PlayerManager.NewPlayerAdded += PlayerManager_NewPlayerAdded;
+        PlayerManager.PlayerWasRemoved += PlayerManager_PlayerWasRemoved;
     }
 
     void OnDisable()
     {
         PlayerManager.NewPlayerAdded -= PlayerManager_NewPlayerAdded;
+        PlayerManager.PlayerWasRemoved -= PlayerManager_PlayerWasRemoved;
     }
 
-    private void PlayerManager_NewPlayerAdded()
+    private void PlayerManager_NewPlayerAdded(int total)
     {
-        if (started) return;
-        started = true;
-        MenuManager.Instance.StartMoving();
+        if (total != 1) return;
+        MenuManager.Instance.StartIndicating();
+    }
+
+    private void PlayerManager_PlayerWasRemoved(int total)
+    {
+        if (total != 0) return;
+        MenuManager.Instance.StartIndicating(false);
     }
 
     public void StartLevelSelect()
@@ -46,7 +52,11 @@ public class MainMenuController : MenuController
         if (soundToggleIcon == null) return;
 
         SoundManager.Instance.ToggleMute();
+        UpdateSoundIcon();
+    }
 
+    public void UpdateSoundIcon()
+    {
         if (SoundManager.Instance.IsMuted())
         {
             soundToggleIcon.sprite = SoundOff;
