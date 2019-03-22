@@ -279,7 +279,7 @@ public class PlayerManager : MonoBehaviour
                 if (!MenuManager.Instance.EnableMultiSelection())
                 {
                     // Return to main menu
-                    GameManager.Instance.StartMainMenu();
+                    //GameManager.Instance.StartMainMenu();
                 }
                 break;
             case GameState.GameOver:

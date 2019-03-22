@@ -218,6 +218,11 @@ public class GameManager : MonoBehaviour
         GameState = GameState.MainMenu;
         InputController.ActiveInputMode = InputController.InputMode.Menu;
 
+        if (SoundManager.Instance.backgroundMenu != null)
+        {
+            SoundManager.Instance.PlayMusic(SoundManager.Instance.backgroundMenu);
+        }
+
         // StartUp Scene
         LevelManager.Instance.LoadMainMenu();
     }
@@ -226,6 +231,11 @@ public class GameManager : MonoBehaviour
     {
         GameState = GameState.LevelSelect;
         InputController.ActiveInputMode = InputController.InputMode.Menu;
+
+        if (SoundManager.Instance.backgroundMenu != null && !SoundManager.Instance.bgmSource.isPlaying)
+        {
+            SoundManager.Instance.PlayMusic(SoundManager.Instance.backgroundMenu);
+        }
 
         LevelManager.Instance.LoadLevelSelect();
     }
@@ -236,16 +246,18 @@ public class GameManager : MonoBehaviour
         GameState = GameState.Playing;
         InputController.ActiveInputMode = InputController.InputMode.Game;
 
+        if (SoundManager.Instance.backgroundGame != null)
+        {
+            SoundManager.Instance.PlayMusic(SoundManager.Instance.backgroundGame);
+        }
+
         //LevelManager.Instance.LoadLevel(levelIndex);
     }
 
     public void StartLevel()
     {
         TurnState = TurnState.Start;
-        if (SoundManager.Instance.backgroundGame != null)
-        {
-            SoundManager.Instance.PlayMusic(SoundManager.Instance.backgroundGame);
-        }
+        
     }
 
     // Called when the player died
