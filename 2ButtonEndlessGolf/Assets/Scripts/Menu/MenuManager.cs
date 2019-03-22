@@ -65,12 +65,12 @@ public class MenuManager : MonoBehaviour
     {
         if (indicate)
         {
-            activeMenuController.menuSelectIndicator.gameObject.SetActive(true);
+            activeMenuController.itemSelectIndicator.gameObject.SetActive(true);
             menuSelector = StartCoroutine(MenuSelection());
         }
         else if (menuSelector != null)
         {
-            activeMenuController.menuSelectIndicator.gameObject.SetActive(false);
+            activeMenuController.itemSelectIndicator.gameObject.SetActive(false);
             StopCoroutine(menuSelector);
             menuSelector = null;
             HighlightButton(buttons[selectedButtonIndex], true);
@@ -114,7 +114,7 @@ public class MenuManager : MonoBehaviour
         var btnRect = btn.GetComponent<RectTransform>();
         var pos = new Vector2(btnRect.localPosition.x, btnRect.localPosition.y);
 
-        activeMenuController.menuSelectIndicator.anchoredPosition = pos + activeMenuController.offset;
+        activeMenuController.itemSelectIndicator.anchoredPosition = pos + activeMenuController.offset;
     }
 
     void HighlightButton(Button btn, bool revert = false)

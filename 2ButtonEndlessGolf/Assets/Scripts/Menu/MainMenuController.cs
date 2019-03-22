@@ -14,7 +14,7 @@ public class MainMenuController : MenuController
     public void Start()
     {
         MenuManager.Instance.SetActiveMenu(this);
-        menuSelectIndicator.gameObject.SetActive(false);
+        itemSelectIndicator.gameObject.SetActive(false);
         UpdateSoundIcon();
     }
 

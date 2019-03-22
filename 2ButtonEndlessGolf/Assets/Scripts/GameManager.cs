@@ -131,7 +131,6 @@ public class GameManager : MonoBehaviour
             _gameState = Instance.GameState;
 
             LoadInstance();
-
             DestroyImmediate(Instance);
             Instance = this;
         }
