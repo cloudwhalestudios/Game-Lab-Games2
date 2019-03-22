@@ -7,6 +7,8 @@ public class LevelSelectMenuController : MenuController
     public void Start()
     {
         MenuManager.Instance.SetActiveMenu(this);
-        itemSelectIndicator.gameObject.SetActive(true);
+        itemSelectIndicator.gameObject.SetActive(false);
+        rowSelectIndicator.gameObject.SetActive(false);
+        MenuManager.Instance.StartIndicating();
     }
 }

@@ -42,10 +42,10 @@ public class LevelManager : MonoBehaviour
         OpenScene(levelSelectSceneName);
     }
 
-    public void LoadLevel(int levelIndex)
+    public void LoadLevel(LevelController controller)
     {
         // LevelSelect Scene    
-        OpenScene(levelControllerPrefabs[levelIndex].name);
+        OpenScene(controller.sceneName);
     }
 
     public void ReloadScene()

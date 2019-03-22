@@ -409,6 +409,90 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 833449442429060335, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 833449442429060335, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 833449442429060335, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 833449442429060335, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 595963917288835683, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 595963917288835683, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 595963917288835683, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 595963917288835683, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8335421320752648085, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8335421320752648085, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8335421320752648085, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8335421320752648085, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1261607176, guid: 4e77228c5bbbcb944b2b77fe5acab718, type: 3}
+      propertyPath: itemIndicatorOffset.y
+      value: 70
+      objectReference: {fileID: 0}
+    - target: {fileID: 7821845280355950516, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7821845280355950516, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7821845280355950516, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7821845280355950516, guid: 4e77228c5bbbcb944b2b77fe5acab718,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4e77228c5bbbcb944b2b77fe5acab718, type: 3}
 --- !u!224 &1261607172 stripped
@@ -846,5 +930,94 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.size
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[1]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[2]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[3]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[4]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[5]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[6]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[7]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[8]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[9]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[10]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[11]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[12]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
+    - target: {fileID: 8951079650811014869, guid: ceb4c6657ab69cc46a862f1df007ffb6,
+        type: 3}
+      propertyPath: levelControllerPrefabs.Array.data[13]
+      value: 
+      objectReference: {fileID: 1894757161591183351, guid: 1ecd3835489155d43b17f87bf49023a8,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ceb4c6657ab69cc46a862f1df007ffb6, type: 3}

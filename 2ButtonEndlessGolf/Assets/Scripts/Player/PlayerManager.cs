@@ -143,6 +143,7 @@ public class PlayerManager : MonoBehaviour
     public int CurrentPlayerID { get; private set; }
     public Color GetCurrentPlayerColor => GetCurrentPlayer.Color;
     public bool FlipAngle => directionToGoal.x > 0;
+    public void SetPlayerActive(bool setActive, int index = 0) => players[index].PGameObject.SetActive(setActive);
 
     private Player GetCurrentPlayer => GetPlayer(currentPlayerID);
     private Player GetPlayer(int id) => players.Find(x => x.ID == currentPlayerID);
@@ -156,7 +157,6 @@ public class PlayerManager : MonoBehaviour
         var playerIndex = players.FindIndex(x => x == player);
         return playerIndex == 0;
     }
-
 
     void Awake()
     {
@@ -276,6 +276,12 @@ public class PlayerManager : MonoBehaviour
                 break;
 
             case GameState.LevelSelect:
+                if (!MenuManager.Instance.EnableMultiSelection())
+                {
+                    // Return to main menu
+                    GameManager.Instance.StartMainMenu();
+                }
+                break;
             case GameState.GameOver:
                 if (isPlayerOne)
                 {

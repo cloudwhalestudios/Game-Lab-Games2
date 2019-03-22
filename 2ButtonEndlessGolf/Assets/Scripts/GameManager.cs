@@ -236,7 +236,7 @@ public class GameManager : MonoBehaviour
         GameState = GameState.Playing;
         InputController.ActiveInputMode = InputController.InputMode.Game;
 
-        LevelManager.Instance.LoadLevel(levelIndex);
+        //LevelManager.Instance.LoadLevel(levelIndex);
     }
 
     public void StartLevel()

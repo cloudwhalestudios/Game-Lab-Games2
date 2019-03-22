@@ -19,6 +19,14 @@ public abstract class MenuController : MonoBehaviour
     public RectTransform rowSelectIndicator;
     public RectTransform columnSelectIndicator;
     public RectTransform itemSelectIndicator;
+
+    [Header("Selection Behaviour")]
     public int startingIndex;
-    public Vector2 offset;
+    public int buttonsPerRow;
+    public int buttonsPerColumn;
+
+    [Header("Offset Tweaking")]
+    public Vector2 itemIndicatorOffset;
+    public Vector2 columnIndicatorOffset;
+    public Vector2 rowIndicatorOffset;
 }
