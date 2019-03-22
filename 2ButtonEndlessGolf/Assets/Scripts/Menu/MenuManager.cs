@@ -9,10 +9,9 @@ public class MenuManager : MonoBehaviour
 {
     public static MenuManager Instance { get; private set; }
 
-    private MenuController activeMenuController;
-
-    int selectedButtonIndex;
-    List<Button> buttons;
+    [SerializeField, ReadOnly] private MenuController activeMenuController;
+    [SerializeField, ReadOnly] private int selectedButtonIndex;
+    [SerializeField, ReadOnly] private List<Button> buttons;
 
     Coroutine menuSelector;
 
@@ -62,11 +61,12 @@ public class MenuManager : MonoBehaviour
     {
         if (start)
         {
+            activeMenuController.menuSelectIndicator.gameObject.SetActive(true);
             menuSelector = StartCoroutine(MenuSelection());
         }
         else if (menuSelector != null)
         {
-            
+            activeMenuController.menuSelectIndicator.gameObject.SetActive(false);
             StopCoroutine(menuSelector);
             menuSelector = null;
         }

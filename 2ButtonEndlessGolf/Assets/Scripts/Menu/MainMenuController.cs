@@ -16,6 +16,7 @@ public class MainMenuController : MenuController
     public void Start()
     {
         MenuManager.Instance.SetActiveMenu(this);
+        menuSelectIndicator.gameObject.SetActive(false);
     }
 
     void OnEnable()

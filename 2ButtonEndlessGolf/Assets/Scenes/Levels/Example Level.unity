@@ -4905,7 +4905,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 453646, guid: 393e1012855d44eb08111c95269092e0, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 11496382, guid: 393e1012855d44eb08111c95269092e0, type: 3}
       propertyPath: background.clip
@@ -5492,7 +5492,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1323402659, guid: 01c58659b8cdd6e4f894a19cd1ec7c2e, type: 3}
       propertyPath: m_Name
-      value: MainCanvas
+      value: GameCanvas
       objectReference: {fileID: 0}
     - target: {fileID: 2492563369487963932, guid: 01c58659b8cdd6e4f894a19cd1ec7c2e,
         type: 3}
@@ -5827,7 +5827,7 @@ PrefabInstance:
     - target: {fileID: 6823107612083014282, guid: ddbeee35dbd0eca41a59d28da446b01a,
         type: 3}
       propertyPath: m_Name
-      value: AssistanceManager
+      value: MenuManager
       objectReference: {fileID: 0}
     - target: {fileID: 6823107612083014285, guid: ddbeee35dbd0eca41a59d28da446b01a,
         type: 3}
@@ -5867,7 +5867,7 @@ PrefabInstance:
     - target: {fileID: 6823107612083014285, guid: ddbeee35dbd0eca41a59d28da446b01a,
         type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6823107612083014285, guid: ddbeee35dbd0eca41a59d28da446b01a,
         type: 3}

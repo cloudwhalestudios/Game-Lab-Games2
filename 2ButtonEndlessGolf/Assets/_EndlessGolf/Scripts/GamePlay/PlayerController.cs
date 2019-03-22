@@ -6,31 +6,31 @@ using UnityEngine;
 // TODO convert to base class
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private int _playerID = -1;
+    [SerializeField, ReadOnly] private int _playerID = -1;
 
-    public int PlayerID { protected set; get; }
+    public int PlayerID { get => _playerID; set => _playerID = value; }
     public Rigidbody2D Rb { get => _rb; set => _rb = value; }
     public int StrokesTaken { get => _strokesTaken; set => _strokesTaken = value; }
 
     public bool IsGrounded { get => _isGrounded; set => _isGrounded = value; }
     public bool IsMoving { get => _isMoving; set => _isMoving = value; }
 
-    [SerializeField] private Rigidbody2D _rb;
-    [SerializeField] private CircleCollider2D cCollider;
+    [SerializeField, ReadOnly] private Rigidbody2D _rb;
+    [SerializeField, ReadOnly] private CircleCollider2D circleCollider;
 
-    [SerializeField] private int _strokesTaken;
+    [SerializeField, ReadOnly] private int _strokesTaken;
 
-    [SerializeField] private Transform checkGround;
+    [SerializeField, ReadOnly] private Transform checkGround;
     
-    [SerializeField] private TrailRenderer trailRender;
-    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField, ReadOnly] private TrailRenderer trailRender;
+    [SerializeField, ReadOnly] private SpriteRenderer spriteRenderer;
 
-    [SerializeField] private Vector3 currentPlayerPosition;
-    [SerializeField] private bool _isGrounded;
-    [SerializeField] private bool _isMoving;
-    [SerializeField] private float startTime;
+    [SerializeField, ReadOnly] private Vector3 currentPlayerPosition;
+    [SerializeField, ReadOnly] private bool _isGrounded;
+    [SerializeField, ReadOnly] private bool _isMoving;
+    [SerializeField, ReadOnly] private float startTime;
 
-    [SerializeField] private int score;
+    [SerializeField, ReadOnly] private int score;
     public int availableUndos;
 
     public void Init(int id)
@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
         // Get components
         Rb = GetComponent<Rigidbody2D>();
         Rb.isKinematic = true;
-        cCollider = GetComponent<CircleCollider2D>();
+        circleCollider = GetComponent<CircleCollider2D>();
         if (spriteRenderer == null)
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
@@ -52,8 +52,8 @@ public class PlayerController : MonoBehaviour
         }
 
         // Apply game manager configuration
-        cCollider.sharedMaterial.friction = GameManager.Instance.friction;
-        cCollider.sharedMaterial.bounciness = GameManager.Instance.bounciness;
+        circleCollider.sharedMaterial.friction = GameManager.Instance.friction;
+        circleCollider.sharedMaterial.bounciness = GameManager.Instance.bounciness;
         availableUndos = GameManager.Instance.availableUndosPerLevel;
 
         // Move the transform infront of other sprites (z-axis)

@@ -92,7 +92,7 @@ public class PlayerManager : MonoBehaviour
             UI.Init(name, primaryKey, secondaryKey);
 
             Color = color;
-            PGameObject.SetActive(false);
+            //PGameObject.SetActive(false);
         }
 
         public void SetKinematic(bool isKinematic)
@@ -102,7 +102,7 @@ public class PlayerManager : MonoBehaviour
 
         public void DestroyPlayer()
         {
-            Destroy (UI);
+            Destroy (UI.gameObject);
             Destroy (PGameObject);
         }
     }
@@ -116,38 +116,41 @@ public class PlayerManager : MonoBehaviour
         GetRGBColor(50f, 205f, 51f),   // Green p3
         GetRGBColor(237f, 4f, 121f)   // Pink p4
     };
-    [SerializeField] private int currentPlayerID;
-    [SerializeField] private List<Player> players;
-    [SerializeField] private int remaningRetries;
+    [SerializeField, ReadOnly] private int currentPlayerID;
+    [SerializeField, ReadOnly] private List<Player> players;
+    [SerializeField, ReadOnly] private int remaningRetries;
 
     [Header("Rotation")]
-    [SerializeField] private Vector2 directionToGoal;
-    [SerializeField] private bool flipAngle;
+    [SerializeField, ReadOnly] private Vector2 directionToGoal;
+    
 
     [Header("Current Player")]
-    [SerializeField] private Quaternion selectedAngle;
-    [SerializeField] private float selectedForce;
-    public int availableRetrys;
+    [SerializeField, ReadOnly] private Quaternion selectedAngle;
+    [SerializeField, ReadOnly] private float selectedForce;
+    [SerializeField, ReadOnly] private int availableRetrys;
 
     [Header("Undo and Respawning")]
-    [SerializeField] private Vector3 lastPosition;
-    [SerializeField] private bool isUndoing;
-    [SerializeField] private TurnState undoTargetState;
+    [SerializeField, ReadOnly] private Vector3 lastPosition;
+    [SerializeField, ReadOnly] private bool isUndoing;
+    [SerializeField, ReadOnly] private TurnState undoTargetState;
 
     [Header("Input and New Player")]
-    [SerializeField] private bool waitingForNextInput;
-    [SerializeField] private KeyCode newPlayer_primaryKey;
-    [SerializeField] private KeyCode newPlayer_secondaryKey;
-    [SerializeField] private Dictionary<KeyCode, Player> playerKeyBindings;
+    [SerializeField, ReadOnly] private bool waitingForNextInput;
+    [SerializeField, ReadOnly] private KeyCode newPlayer_primaryKey;
+    [SerializeField, ReadOnly] private KeyCode newPlayer_secondaryKey;
+    [SerializeField, ReadOnly] private Dictionary<KeyCode, Player> playerKeyBindings;
 
     public int CurrentPlayerID { get; private set; }
-    Player GetCurrentPlayer() => GetPlayer(currentPlayerID);
-    Player GetPlayer(int id) => players.Find(x => x.ID == currentPlayerID);
+    public Color GetCurrentPlayerColor => GetCurrentPlayer.Color;
+    public bool FlipAngle => directionToGoal.x > 0;
+
+    private Player GetCurrentPlayer => GetPlayer(currentPlayerID);
+    private Player GetPlayer(int id) => players.Find(x => x.ID == currentPlayerID);
     private bool IsInputFromPlayer(int id, KeyCode key) => IsInputFromPlayer(GetPlayer(id), key);
-    bool IsInputFromCurrentPlayer(KeyCode pressedKey) => IsInputFromPlayer(GetCurrentPlayer(), pressedKey);
-    bool IsInputFromPlayer(Player player, KeyCode pressedKey) => (player.Input.PrimaryKey == pressedKey || player.Input.SecondaryKey == pressedKey);
-    bool IsPlayerInput(KeyCode pressedKey) => playerKeyBindings.ContainsKey(pressedKey);
-    bool IsPlayerOneInput(KeyCode pressedKey)
+    private bool IsInputFromCurrentPlayer(KeyCode pressedKey) => IsInputFromPlayer(GetCurrentPlayer, pressedKey);
+    private bool IsInputFromPlayer(Player player, KeyCode pressedKey) => (player.Input.PrimaryKey == pressedKey || player.Input.SecondaryKey == pressedKey);
+    private bool IsPlayerInput(KeyCode pressedKey) => playerKeyBindings.ContainsKey(pressedKey);
+    private bool IsPlayerOneInput(KeyCode pressedKey)
     {
         var player = playerKeyBindings[pressedKey];
         var playerIndex = players.FindIndex(x => x == player);
@@ -195,27 +198,45 @@ public class PlayerManager : MonoBehaviour
     
     private void OnEnable()
     {
-        InputController.Game.Primary += OnPrimaryGame;
-        InputController.Game.Secondary += OnSecondaryGame;
-
-        InputController.Menu.Primary += OnPrimaryMenu;
-        InputController.Menu.Secondary += OnSecondaryMenu;
-
-        GameManager.TurnStateChanged += OnTurnStateChanged;
-        GameManager.GameStateChanged += OnGameStateChanged;
-        GameManager.MapBoundsExit += OnMapBoundsExit;
+        SetEventHandles();
     }
     private void OnDisable()
     {
-        InputController.Game.Primary -= OnPrimaryGame;
-        InputController.Game.Secondary -= OnSecondaryGame;
-        
-        InputController.Menu.Primary -= OnPrimaryMenu;
-        InputController.Menu.Secondary -= OnSecondaryMenu;
-        
-        GameManager.TurnStateChanged -= OnTurnStateChanged;
-        GameManager.GameStateChanged -= OnGameStateChanged;
-        GameManager.MapBoundsExit -= OnMapBoundsExit;   
+        SetEventHandles(true);
+    }
+
+    void SetEventHandles(bool remove = false)
+    {
+        if (!remove)
+        {
+            //InputController.Game.Primary += OnPrimaryGame;
+            //InputController.Game.Secondary += OnSecondaryGame;
+
+            InputController.Menu.Primary += OnPrimaryMenu;
+            InputController.Menu.Secondary += OnSecondaryMenu;
+
+            GameManager.TurnStateChanged += OnTurnStateChanged;
+            GameManager.GameStateChanged += OnGameStateChanged;
+            GameManager.MapBoundsExit += OnMapBoundsExit;
+        }
+        else
+        {
+            //InputController.Game.Primary -= OnPrimaryGame;
+            //InputController.Game.Secondary -= OnSecondaryGame;
+
+            InputController.Menu.Primary -= OnPrimaryMenu;
+            InputController.Menu.Secondary -= OnSecondaryMenu;
+
+            GameManager.TurnStateChanged -= OnTurnStateChanged;
+            GameManager.GameStateChanged -= OnGameStateChanged;
+            GameManager.MapBoundsExit -= OnMapBoundsExit;
+        }
+    }
+
+    void RefreshHandles()
+    {
+        SetEventHandles(true);
+        SetEventHandles();
     }
 
     #region Input Listeners
@@ -267,15 +288,20 @@ public class PlayerManager : MonoBehaviour
     }
     #endregion
 
-    #region Game Listeners
+    #region State Listeners
     private void OnGameStateChanged(GameState newState, GameState oldState)
     {
         switch (newState)
         {
             case GameState.MainMenu:
-
+            case GameState.LevelSelect:
+            case GameState.Paused:
+            case GameState.GameOver:
+                //InputController.ActiveInputMode = InputController.InputMode.Menu;
+                ActivatePlayerObjects(false);
                 break;
             case GameState.Playing:
+                //InputController.ActiveInputMode = InputController.InputMode.Game;
                 ActivatePlayerObjects();
                 break;
             default:
@@ -318,15 +344,17 @@ public class PlayerManager : MonoBehaviour
                 StartTurn();
                 break;
             case TurnState.Angle:
+                GolfHitManager.Instance.SetPosition(GetCurrentPlayer.PGameObject.transform.position);
                 break;
             case TurnState.Power:
+                GolfHitManager.Instance.SetPosition(GetCurrentPlayer.PGameObject.transform.position);
                 SetUndoState(TurnState.Angle);
                 break;
             case TurnState.Firing:
                 StartCoroutine(WaitForMovementStop());
                 break;
             case TurnState.End:
-                SetUndoState(TurnState.Power);
+                SetUndoState(TurnState.Angle);
                 StartEndingTurn();
                 break;
         }
@@ -409,6 +437,8 @@ public class PlayerManager : MonoBehaviour
 
         UpdatePlayerPlaceholder();
 
+        //RefreshHandles();
+
         NewPlayerAdded();
     }
 
@@ -453,19 +483,17 @@ public class PlayerManager : MonoBehaviour
     {
         // See if the angle has to be flipped
         directionToGoal = GameManager.Instance.goalObject.transform.position - transform.position;
-        flipAngle = directionToGoal.x > 0;
-
         selectedAngle = Quaternion.Lerp(Quaternion.identity, Quaternion.Euler(0f, 0f, 90f), GolfHitManager.Instance.CurrentAnglePercentage);
     }
     void SelectPower()
     {
-        selectedForce = GolfHitManager.Instance.CurrentPowerPercentage * GameManager.Instance.force;
+        selectedForce = GolfHitManager.Instance.CurrentPowerPercentage * GameManager.Instance.maxForce;
     }
 
     void HitBall()
     {
         // Quick access
-        var player = GetCurrentPlayer();
+        var player = GetCurrentPlayer;
         var pObject = player.PGameObject;
         var controller = player.Controller;
         
@@ -473,20 +501,20 @@ public class PlayerManager : MonoBehaviour
         lastPosition = pObject.transform.position;
 
         var force = selectedAngle * new Vector2(selectedForce, 0);
-        if (flipAngle)
+        if (FlipAngle)
         {
             //Debug.Log("Flipping angle...");
             force.x = -force.x;
         }
         //Debug.Log("Firing! " + force);
         Debug.DrawLine(pObject.transform.position, pObject.transform.position + force, Color.magenta, 5f);
-        GetCurrentPlayer().SetKinematic(false);
+        GetCurrentPlayer.SetKinematic(false);
         controller.Rb.AddForce(force, ForceMode2D.Impulse);
     }
     
     IEnumerator WaitForMovementStop()
     {
-        var player = GetCurrentPlayer();
+        var player = GetCurrentPlayer;
         player.Controller.IsMoving = true;
 
         while (player.Controller.IsMoving)
@@ -495,7 +523,7 @@ public class PlayerManager : MonoBehaviour
             yield return new WaitForSeconds(GameManager.Instance.checkRate);
         }
         //Debug.Log("Finished moving");
-        GetCurrentPlayer().SetKinematic(true);
+        GetCurrentPlayer.SetKinematic(true);
         GameManager.Instance.AdvanceTurn();
         yield return null;
     }
@@ -515,7 +543,7 @@ public class PlayerManager : MonoBehaviour
     {
         var currentTurnState = GameManager.Instance.TurnState;
         var allowUndo = (currentTurnState == TurnState.End || currentTurnState == TurnState.Power);
-        var player = GetCurrentPlayer();
+        var player = GetCurrentPlayer;
 
         if (currentTurnState == TurnState.End)
         {
@@ -523,7 +551,7 @@ public class PlayerManager : MonoBehaviour
             {
                 // Interrupt
                 StopCoroutine("SwitchTurn");
-                GetCurrentPlayer().Controller.availableUndos--;
+                GetCurrentPlayer.Controller.availableUndos--;
                 //Debug.Log("Interrupting player switch... (interrupts remaining: " + GetCurrentPlayer().Controller.availableUndos + ")");
             }
             else
@@ -545,7 +573,7 @@ public class PlayerManager : MonoBehaviour
     }
     private void OnMapBoundsExit(Collider2D collision)
     {
-        var player = GetCurrentPlayer();
+        var player = GetCurrentPlayer;
         if (collision.gameObject == player.PGameObject)
         {
             //Debug.Log("Out of bounds!");

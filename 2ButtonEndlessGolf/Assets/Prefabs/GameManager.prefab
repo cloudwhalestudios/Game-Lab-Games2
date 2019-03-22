@@ -46,7 +46,7 @@ MonoBehaviour:
   _gameState: 0
   _turnState: 0
   targetFrameRate: 60
-  autoInterval: 0.5
+  autoInterval: 1
   endOfTurnTime: 2
   goalObject: {fileID: 0}
   checkPointBelow: 0.1
@@ -56,7 +56,9 @@ MonoBehaviour:
   playerUIContainer: {fileID: 0}
   playerUIPrefab: {fileID: 205615670494183036, guid: be06992d74bf59643ae74a3462bc0330,
     type: 3}
-  force: 200
+  pressToJoinPlaceholder: {fileID: 0}
+  newPlayerDialog: {fileID: 0}
+  maxForce: 200
   checkRate: 0.2
   checkGroundRadius: 0.1
   groundLayer:
@@ -66,7 +68,3 @@ MonoBehaviour:
   bounciness: 0.2
   availableUndosPerLevel: 3
   availableRetriesPerShot: 2
-  minFallingSpeed: -20
-  maxFallingSpeed: 5
-  ratioWithWindForce: 1
-  fallingEffect: {fileID: 0}

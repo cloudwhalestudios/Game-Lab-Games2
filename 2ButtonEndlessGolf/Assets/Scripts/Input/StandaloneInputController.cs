@@ -8,13 +8,4 @@ public class StandaloneInputController : InputController
         PrimaryKey = primary;
         SecondaryKey = secondary;
     }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(PrimaryKey))
-            OnPrimary(PrimaryKey);
-
-        if (Input.GetKeyDown(SecondaryKey))
-            OnSecondary(SecondaryKey);
-    }
 }

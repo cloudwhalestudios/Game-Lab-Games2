@@ -75,17 +75,8 @@ public class GameManager : MonoBehaviour
     }
 
     [SerializeField] private GameState _gameState;
-
     [SerializeField] private TurnState _turnState = TurnState.NotPlaying;
-
-    public static int GameCount
-    {
-        get { return _gameCount; }
-        private set { _gameCount = value; }
-    }
-
-    private static int _gameCount = 0;
-
+    
     [Header("Set the target frame rate for this game")]
     [Tooltip("Use 60 for games requiring smooth quick motion, set -1 to use platform default frame rate")]
     public int targetFrameRate = -1;
@@ -94,15 +85,16 @@ public class GameManager : MonoBehaviour
     public float autoInterval = 1f;
     public float endOfTurnTime = 2f;
 
+    [Range(1, 10)] public int angleStepCount = 5;
+    [Range(1, 10)] public int powerStepCount = 5;
+    public float minPowerIndicatorScale = 1;
+    public float maxPowerIndicatorScale = 2;
+
+
     [Header("Current Level Config")]
     public GameObject goalObject;
     public float checkPointBelow;
     public GameObject mapBounds;
-
-    [Header("Scene Management")]
-    public Object mainMenuScene;
-    public Object levelSelect;
-    public List<LevelController> levelPrefabs;
 
     [Header("Player Config")]
     public GameObject playerPrefab;
@@ -110,9 +102,15 @@ public class GameManager : MonoBehaviour
     public GameObject playerUIPrefab;
     public GameObject pressToJoinPlaceholder;
     public NewPlayerDialog newPlayerDialog;
-    public float force = 200;
-    public float checkRate = 0.2f;
 
+    [Header("Gameplay Config")]
+    public float minForce = 20f;
+    public float maxForce = 200f;
+
+    public float minAngle = 10f;
+    public float maxAngle = 80f;
+
+    public float checkRate = 0.2f;
     public float checkGroundRadius = 0.1f;
     public LayerMask groundLayer;
 
@@ -127,11 +125,15 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(this);
         }
         else
         {
-            DestroyImmediate(this);
+            _gameState = Instance.GameState;
+
+            LoadInstance();
+
+            DestroyImmediate(Instance);
+            Instance = this;
         }
     }
     void OnDestroy()
@@ -147,7 +149,28 @@ public class GameManager : MonoBehaviour
     {
         // Initial setup
         Application.targetFrameRate = targetFrameRate;
-        StartMainMenu();
+    }
+
+    public void LoadInstance()
+    {
+        switch (GameState)
+        {
+            case GameState.MainMenu:
+                break;
+            case GameState.LevelSelect:
+                break;
+            case GameState.Playing:
+                StartLevel();
+                break;
+            case GameState.Paused:
+                break;
+            case GameState.PreGameOver:
+                break;
+            case GameState.GameOver:
+                break;
+            default:
+                break;
+        }
     }
 
     public void AdvanceTurn(bool playerInput = false)
@@ -197,7 +220,7 @@ public class GameManager : MonoBehaviour
         InputController.ActiveInputMode = InputController.InputMode.Menu;
 
         // StartUp Scene
-        //SceneManager.LoadScene(mainMenuScene.name);
+        LevelManager.Instance.LoadMainMenu();
     }
 
     public void StartLevelSelect ()
@@ -205,28 +228,25 @@ public class GameManager : MonoBehaviour
         GameState = GameState.LevelSelect;
         InputController.ActiveInputMode = InputController.InputMode.Menu;
 
-        // LevelSelect Scene    
-        SceneManager.LoadScene(levelSelect.name);
+        LevelManager.Instance.LoadLevelSelect();
     }
 
     // A new game official starts
-    public void StartGame(LevelController level)
+    public void StartGame(int levelIndex)
     {
         GameState = GameState.Playing;
         InputController.ActiveInputMode = InputController.InputMode.Game;
 
-        SceneManager.LoadScene(level.scene.name);
-
-        if (SoundManager.Instance.backgroundGame != null)
-        {
-            SoundManager.Instance.PlayMusic(SoundManager.Instance.backgroundGame);
-        }
-        StartLevel();
+        LevelManager.Instance.LoadLevel(levelIndex);
     }
 
     public void StartLevel()
     {
         TurnState = TurnState.Start;
+        if (SoundManager.Instance.backgroundGame != null)
+        {
+            SoundManager.Instance.PlayMusic(SoundManager.Instance.backgroundGame);
+        }
     }
 
     // Called when the player died
