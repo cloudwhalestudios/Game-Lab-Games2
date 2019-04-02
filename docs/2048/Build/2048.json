@@ -1,0 +1,12 @@
+{
+"companyName": "DefaultCompany",
+"productName": "2Button2048",
+"dataUrl": "2048.data.unityweb",
+"wasmCodeUrl": "2048.wasm.code.unityweb",
+"wasmFrameworkUrl": "2048.wasm.framework.unityweb",
+"TOTAL_MEMORY": 268435456,
+"graphicsAPI": ["WebGL 2.0", "WebGL 1.0"],
+"webglContextAttributes": {"preserveDrawingBuffer": false},
+"splashScreenStyle": "Dark",
+"backgroundColor": "#231F20"
+}

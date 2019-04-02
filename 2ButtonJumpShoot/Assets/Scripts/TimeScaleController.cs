@@ -72,7 +72,7 @@ public class TimeScaleController : MonoBehaviour
         {
             ApplyTimeScale(defaultTimeScale);
         }
-        Debug.Log(Time.timeScale);
+        //Debug.Log(Time.timeScale);
     }
 
     public void Pause(bool pause = true)

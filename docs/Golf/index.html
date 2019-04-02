@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | 2ButtonEndlessGolf</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script src="TemplateData/UnityProgress.js"></script>
+    <script src="Build/UnityLoader.js"></script>
+    <script>
+      var gameInstance = UnityLoader.instantiate("gameContainer", "Build/Golf.json", {onProgress: UnityProgress});
+    </script>
+  </head>
+  <body>
+    <div class="webgl-content">
+      <div id="gameContainer" style="width: 1600px; height: 900px"></div>
+      <div class="footer">
+        <div class="webgl-logo"></div>
+        <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
+        <div class="title">2ButtonEndlessGolf</div>
+		<div class="controls">
+		<h2>Controls</h2>
+		<h3>Main Menu</h3>
+		<p>Press any button to join (this will be your <b>primary button</b>). Then press another button (this will be your <b>secondary button</b>)</p>
+		<p>Primary Button - Select currently indicated button</p>
+		<p>Secondary Button - Leave Game (removes the set of controls for the player that joined)</p>
+		<hr>
+		<h3>Level Select</h3>
+		<p>Primary Button - Row Selection: Select a row <br>
+		Item Selection: Select currently indicated button</p>
+		<p>Secondary Button - Row Selection: <strik>Go back to main menu</strike> Currently disabled, needs fixing<br>
+		Item Selection: Go back to row selection</p>
+		<hr>
+		<h3>Level X</h3>
+		<p><b>Was working before adding multiplayer and menus, currently broken sorry.</b></p>
+		<p>Primary Button - Game: Progress through turn<br>
+		Pause Menu and End Screen: Select currently indicated button</p>
+		<p>Secondary Button - Game: Pause Game<br>
+		Pause Menu: Current Player only - Undo (return to last state; works during power select; can be used only be used x times during player switching after a firing and the ball stopped moving)</p>
+	  </div>
+      </div>
+    </div>
+  </body>
+</html>
