@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Wave/Scenes/Main Scene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Wave/Scenes/IntroScene.unity
+    guid: 76a1c5ccfaa7e4b0485e5944d38e5d79
+  - enabled: 1
+    path: Assets/Wave/Scenes/MainMenuSceneWave.unity
+    guid: 58a2825265984f24d966edf74c1551f1
   m_configObjects: {}
