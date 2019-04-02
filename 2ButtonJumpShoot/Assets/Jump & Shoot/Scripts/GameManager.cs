@@ -6,6 +6,7 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
 
 
     public TextMeshProUGUI scoreText;
@@ -28,9 +29,26 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            DestroyImmediate(Instance);
+            Instance = this;
+        }
+
         isDead = false;
         Application.targetFrameRate = 60;
-        Time.timeScale = 1.0f;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     void Start()

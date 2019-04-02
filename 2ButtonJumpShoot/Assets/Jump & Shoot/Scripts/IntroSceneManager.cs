@@ -9,7 +9,6 @@ public class IntroSceneManager : MonoBehaviour {
         StartCoroutine(GoToMainScene());
     }
 
-
     IEnumerator GoToMainScene()
     {
         yield return new WaitForSeconds(2);

@@ -1,18 +1,22 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public static event Action PlayerJumped;
+    public static event Action PlayerShot;
+    public static event Action PlayerLandedOnPlatform;
+    public static event Action PlayerCrossedPlatform;
 
-    enum PlyerState
+    enum PlayerState
     {
-        Stading, Jumping, falling
+        Standing, Jumping, Falling
     }
-    PlyerState currentState;
+    PlayerState currentState;
 
     public Transform playerParentTransform;
-
   
     [Space]
     public GameObject fx_Shoot_1;
@@ -35,30 +39,59 @@ public class Player : MonoBehaviour
 
     bool isDead = false;
 
+    bool hasCrossedPlatform = false;
+    bool isOnPlatform = false;
+
     float LeftEnd;
     float RightEnd;
-
-
-
-
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         bc2D = GetComponent<BoxCollider2D>();
         trailRenderer = GetComponent<TrailRenderer>();
-
-        LeftEnd = GameObject.Find("GameManager").GetComponent<GetDisplayBound>().Left;
-        RightEnd = GameObject.Find("GameManager").GetComponent<GetDisplayBound>().Right;
     }
-
 
     void Start()
     {
+        LeftEnd = GameManager.Instance.GetComponent<GetDisplayBound>().Left;
+        RightEnd = GameManager.Instance.GetComponent<GetDisplayBound>().Right;
+
         InitPlayer();
 
-        hueValue = Random.Range(0, 10) / 10.0f;
+        hueValue = UnityEngine.Random.Range(0, 10) / 10.0f;
         ChangeBackgroundColor();
+    }
+
+    void PlayerStartedJumping()
+    {
+        isOnPlatform = false;
+        hasCrossedPlatform = false;
+
+        PlayerJumped?.Invoke();
+    }
+
+    void PlayerHasCrossedPlatform()
+    {
+        if(!hasCrossedPlatform)
+        {
+            hasCrossedPlatform = true;
+            PlayerCrossedPlatform?.Invoke();
+        }
+    }
+
+    void PlayerStartedShooting()
+    {
+        PlayerShot?.Invoke();
+    }
+
+    void PlayerHasLandedOnPlatform()
+    {
+        if (!isOnPlatform)
+        {
+            isOnPlatform = true;
+            PlayerLandedOnPlatform?.Invoke();
+        }
     }
 
     void InitPlayer()
@@ -66,7 +99,7 @@ public class Player : MonoBehaviour
         trailRenderer.startWidth = transform.localScale.x;
         trailRenderer.endWidth = transform.localScale.x;
 
-        currentState = PlyerState.falling;
+        currentState = PlayerState.Falling;
         rb.velocity = new Vector2(0, 0);
     }
 
@@ -78,9 +111,14 @@ public class Player : MonoBehaviour
 
         previousPosXofParent = transform.parent.transform.position.x;
 
-        if (currentState == PlyerState.Jumping)
+        if (currentState == PlayerState.Jumping)
         {
             transform.Rotate(Vector3.forward * Time.deltaTime * rb.velocity.x * (-30));
+
+            if (transform.position.y >= playerParentTransform.position.y + StepManager.Instance.DistanceToNextStep)
+            {
+                PlayerHasCrossedPlatform();
+            }
         }
     }
 
@@ -88,13 +126,14 @@ public class Player : MonoBehaviour
 
     void GetInput()
     {
+        // TODO change to primary
         if (Input.GetMouseButtonDown(0))
         {
-            if (currentState == PlyerState.Stading)
+            if (currentState == PlayerState.Standing)
             {
                 Jump();
             }
-            else if (currentState == PlyerState.Jumping)
+            else if (currentState == PlayerState.Jumping)
             {
                 StartCoroutine(Shoot());
             }
@@ -120,12 +159,13 @@ public class Player : MonoBehaviour
 
     void Jump()
     {
+        PlayerStartedJumping();
         JumpEffect();
 
         float parentVelocity = (transform.parent.transform.position.x - previousPosXofParent) / Time.deltaTime;
         rb.velocity = new Vector2(parentVelocity, jumpSpeed);
 
-        currentState = PlyerState.Jumping;
+        currentState = PlayerState.Jumping;
 
         bc2D.enabled = false;
 
@@ -151,17 +191,17 @@ public class Player : MonoBehaviour
             Destroy(Instantiate(fx_Dead, transform.position, Quaternion.identity), 1.0f);
 
 
-            GameObject.Find("GameManager").GetComponent<GameManager>().GameOver();
+            GameManager.Instance.GameOver();
         }
     }
 
-
     IEnumerator Shoot()
     {
+        PlayerStartedShooting();
 
         transform.rotation = Quaternion.identity;
 
-        currentState = PlyerState.falling;
+        currentState = PlayerState.Falling;
 
         ShootEffect1();
 
@@ -194,29 +234,28 @@ public class Player : MonoBehaviour
         Destroy(EffectObj, 0.5f);
     }
 
-
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.tag == "Step" && currentState == PlyerState.falling && rb.velocity == Vector2.zero)
+        if (other.gameObject.tag == "Step" && currentState == PlayerState.Falling && rb.velocity == Vector2.zero)
         {
+            PlayerHasLandedOnPlatform();
+
             Destroy(Instantiate(fx_Land, transform.position, Quaternion.identity), 0.5f);
 
             rb.velocity = new Vector2(0, 0);
-            currentState = PlyerState.Stading;
+            currentState = PlayerState.Standing;
 
             transform.SetParent(other.gameObject.transform);
 
             other.gameObject.GetComponent<Step>().StartCoroutine_LandingEffect();
 
-
-            GameObject.Find("GameManager").GetComponent<GameManager>().AddScore(1);
+            GameManager.Instance.AddScore(1);
         }
     }
 
-
     void OnCollisionExit2D(Collision2D other)
     {
-        GameObject.Find("StepManager").GetComponent<StepManager>().MakeStep();
+        StepManager.Instance.MakeStep();
         StepDestroyEffect(other);
 
         Destroy(other.gameObject, 0.1f);
@@ -230,19 +269,14 @@ public class Player : MonoBehaviour
         Destroy(fxObj, 0.5f);
     }
 
-
-
-
     void ChangeBackgroundColor()
     {
         Camera.main.backgroundColor = Color.HSVToRGB(hueValue, 0.6f, 0.8f);
         hueValue += 0.1f;
+
         if (hueValue >= 1)
         {
             hueValue = 0;
         }
     }
-
-
-
 }
