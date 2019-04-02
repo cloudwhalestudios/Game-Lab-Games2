@@ -127,7 +127,7 @@ public class Player : MonoBehaviour
     void GetInput()
     {
         // TODO change to primary
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             if (currentState == PlayerState.Standing)
             {

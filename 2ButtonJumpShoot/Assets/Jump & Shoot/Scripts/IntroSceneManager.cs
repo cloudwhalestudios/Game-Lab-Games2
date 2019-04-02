@@ -12,7 +12,7 @@ public class IntroSceneManager : MonoBehaviour {
     IEnumerator GoToMainScene()
     {
         yield return new WaitForSeconds(2);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        SceneManager.LoadScene("MainMenuScene");
         yield break;
     }
 }

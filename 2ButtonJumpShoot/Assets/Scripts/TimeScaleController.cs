@@ -46,10 +46,17 @@ public class TimeScaleController : MonoBehaviour
 
     private void ApplyTimeScale(float scale, bool isPause = false)
     {
+        // remember the last active timescale
         if (isPause)
         {
-            // remember the last active timescale
-            unpausedTimeScale = Time.timeScale;
+            if (Time.timeScale == slowMotionTimeScale)
+            {
+                unpausedTimeScale = slowMotionTimeScale;
+            }
+            else
+            {
+                unpausedTimeScale = defaultTimeScale;
+            }
         }
 
         Time.timeScale = scale;

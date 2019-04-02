@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-
-    public GameManager theGameManager;
+    public static AudioManager Instance { get; private set; }
 
     [Header("Music input")]
     public AudioSource gameMusic;
@@ -18,19 +17,44 @@ public class AudioManager : MonoBehaviour
 
     private bool filterSound;
 
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(this);
+            DontDestroyOnLoad(gameMusic);
+            DontDestroyOnLoad(gameMusicFiltered);
+        }
+        else
+        {
+            DestroyImmediate(gameMusic);
+            DestroyImmediate(gameMusicFiltered);
+            DestroyImmediate(this);
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
     void Start()
     {
-        theGameManager = FindObjectOfType<GameManager>();
         DisableMusic();
     }
 
     void Update()
     {
-        if (theGameManager.isDead == false)
+        if (GameManager.Instance?.isDead == false)
         {
             gameMusic.mute = false;
             gameMusicFiltered.mute = true;
-        } else
+        }
+        else
         {
             gameMusic.mute = true;
             gameMusicFiltered.mute = false;

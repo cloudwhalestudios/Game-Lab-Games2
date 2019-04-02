@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI bestText;
 
     public GameObject GameOverPanel;
+    public GameObject PauseMenuPanel;
     public GameObject GameOverEffectPanel;
 
     public GameObject StartEffectPanel;
@@ -23,7 +24,6 @@ public class GameManager : MonoBehaviour
 
     [HideInInspector]
     public bool isDead;
-
 
     int score = 0;
 
@@ -55,7 +55,6 @@ public class GameManager : MonoBehaviour
     {
         StartCoroutine(StartEffect());
     }
-
 
     IEnumerator StartEffect()
     {
@@ -95,22 +94,52 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.5f);
         Time.timeScale = 0.02f;
-        GameOverPanel.SetActive(true);
+        SetGameOverActive(true);
 
         yield return new WaitForSecondsRealtime(2.5f);
-        Time.timeScale = 0f;
-
+        TimeScaleController.Instance.Pause(true);
 
         yield break;
     }
 
+    public void Pause()
+    {
+        TimeScaleController.Instance.Pause();
+
+        scoreText.color = Color.white;
+        bestText.color = Color.gray;
+        bestValueText.color = Color.gray;
+
+        SetPauseMenuActive(true);
+    }
+    public void Resume()
+    {
+        TimeScaleController.Instance.Pause(false);
+
+        var color = new Color(0, 0, 0, 29f / 255);
+        scoreText.color = color;
+        bestText.color = color;
+        bestValueText.color = color;
+
+        SetPauseMenuActive(false);
+    }
+
+    void SetPauseMenuActive(bool activate = true)
+    {
+        PauseMenuPanel.SetActive(activate);
+        GameOverPanel.SetActive(false);
+    }
+
+    void SetGameOverActive(bool activate = true)
+    {
+        GameOverPanel.SetActive(activate);
+        PauseMenuPanel.SetActive(false);
+    }
 
     public void Restart()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
-
-
 
     public void OpenHowToPanel(){
         HowToPlayPanel.SetActive(true);
