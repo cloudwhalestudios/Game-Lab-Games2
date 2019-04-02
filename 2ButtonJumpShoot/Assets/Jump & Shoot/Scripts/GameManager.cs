@@ -74,6 +74,7 @@ public class GameManager : MonoBehaviour
         {
             bestValueText.text = score.ToString();
             PlayerPrefs.SetInt("BestScore", score);
+            AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.Highscore);
         }
     }
 
@@ -111,6 +112,7 @@ public class GameManager : MonoBehaviour
         bestValueText.color = Color.gray;
 
         SetPauseMenuActive(true);
+        AudioManager.Instance.PlaySound(AudioManager.Instance.Alternate);
     }
     public void Resume()
     {
@@ -122,6 +124,7 @@ public class GameManager : MonoBehaviour
         bestValueText.color = color;
 
         SetPauseMenuActive(false);
+        AudioManager.Instance.PlaySound(AudioManager.Instance.Alternate);
     }
 
     void SetPauseMenuActive(bool activate = true)
@@ -138,6 +141,7 @@ public class GameManager : MonoBehaviour
 
     public void Restart()
     {
+        AudioManager.Instance.PlaySound(AudioManager.Instance.Alternate);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 

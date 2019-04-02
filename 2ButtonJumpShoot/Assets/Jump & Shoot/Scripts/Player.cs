@@ -82,6 +82,7 @@ public class Player : MonoBehaviour
 
     void PlayerStartedShooting()
     {
+        AudioManager.Instance.PlaySound(AudioManager.Instance.Shoot);
         PlayerShot?.Invoke();
     }
 
@@ -89,6 +90,7 @@ public class Player : MonoBehaviour
     {
         if (!isOnPlatform)
         {
+            AudioManager.Instance.PlaySound(AudioManager.Instance.BassCrash);
             isOnPlatform = true;
             PlayerLandedOnPlatform?.Invoke(transform.position);
         }
@@ -136,6 +138,7 @@ public class Player : MonoBehaviour
             else if (currentState == PlayerState.Jumping)
             {
                 StartCoroutine(Shoot());
+                AudioManager.Instance.PlaySound(AudioManager.Instance.Fly);
             }
         }
     }
@@ -159,6 +162,7 @@ public class Player : MonoBehaviour
 
     void Jump()
     {
+        AudioManager.Instance.PlaySound(AudioManager.Instance.Jump);
         PlayerStartedJumping();
         JumpEffect();
 
@@ -184,6 +188,7 @@ public class Player : MonoBehaviour
     {
         if (isDead == false && Camera.main.transform.position.y - transform.position.y > 10)
         {
+            AudioManager.Instance.PlaySound(AudioManager.Instance.Death);
             isDead = true;
             rb.isKinematic = true;
             rb.velocity = Vector2.zero;

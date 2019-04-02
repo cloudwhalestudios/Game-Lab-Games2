@@ -10,6 +10,18 @@ public class AudioManager : MonoBehaviour
     public AudioSource gameMusic;
     public AudioSource gameMusicFiltered;
 
+    [Header("SFX input")]
+    public AudioSource Death;
+    public AudioSource Jump;
+    public AudioSource Bounce;
+    public AudioSource Fly;
+    public AudioSource Shoot;
+    public AudioSource Bass;
+    public AudioSource BassCrash;
+    public AudioSource BassCrashHighscore;
+    public AudioSource Highscore;
+    public AudioSource Alternate;
+
     [Header("Sound effects")]
     public float lowPitchRange = 0.75f;
     public float highPitchRange = 1.25f;
@@ -70,6 +82,11 @@ public class AudioManager : MonoBehaviour
     public void PlaySound(AudioSource sound)
     {
         sound.pitch = Random.Range(lowPitchRange, highPitchRange);
+        sound.Play(0);
+    }
+
+    public void PlaySoundNormally(AudioSource sound)
+    {
         sound.Play(0);
     }
 
