@@ -19,14 +19,14 @@ public class SlowMotionEventHandler : MonoBehaviour
         Player.PlayerLandedOnPlatform -= Player_PlayerLandedOnPlatform;
     }
 
-    private void Player_PlayerLandedOnPlatform()
+    private void Player_PlayerLandedOnPlatform(Vector3 position)
     {
-        TimeScaleController.Instance.SetSlowMotionActive();
+        TimeScaleController.Instance.SetSlowMotionActive(false);
     }
 
     private void Player_PlayerShot()
     {
-        TimeScaleController.Instance.SetSlowMotionActive(false);
+        
     }
 
     private void Player_PlayerCrossedPlatform()

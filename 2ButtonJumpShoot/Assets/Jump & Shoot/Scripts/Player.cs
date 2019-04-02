@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
 {
     public static event Action PlayerJumped;
     public static event Action PlayerShot;
-    public static event Action PlayerLandedOnPlatform;
+    public static event Action<Vector3> PlayerLandedOnPlatform;
     public static event Action PlayerCrossedPlatform;
 
     enum PlayerState
@@ -90,7 +90,7 @@ public class Player : MonoBehaviour
         if (!isOnPlatform)
         {
             isOnPlatform = true;
-            PlayerLandedOnPlatform?.Invoke();
+            PlayerLandedOnPlatform?.Invoke(transform.position);
         }
     }
 
@@ -113,7 +113,7 @@ public class Player : MonoBehaviour
 
         if (currentState == PlayerState.Jumping)
         {
-            transform.Rotate(Vector3.forward * Time.deltaTime * rb.velocity.x * (-30));
+            transform.Rotate(Vector3.forward * Time.unscaledDeltaTime * rb.velocity.x * (-30));
 
             if (transform.position.y >= playerParentTransform.position.y + StepManager.Instance.DistanceToNextStep)
             {
@@ -208,13 +208,13 @@ public class Player : MonoBehaviour
         rb.isKinematic = true;
         rb.velocity = new Vector2(0, 0);
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSecondsRealtime(0.5f);
 
         ShootEffect2();
         ChangeBackgroundColor();
 
         rb.isKinematic = false;
-        rb.velocity = new Vector2(0, -shootSpeed);
+        rb.velocity = new Vector2(0, -shootSpeed / Time.timeScale);
 
         bc2D.enabled = true;
 
