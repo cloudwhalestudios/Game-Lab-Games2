@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class StepManager : MonoBehaviour
 {
+    public static StepManager Instance { get; private set; }
+
 
     public GameObject StepPrefab;
 
@@ -21,6 +23,27 @@ public class StepManager : MonoBehaviour
 
     float halfWidth;
 
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            DestroyImmediate(Instance);
+            Instance = this;
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
 
     void Start()
     {

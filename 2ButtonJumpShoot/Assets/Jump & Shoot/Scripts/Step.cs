@@ -9,11 +9,8 @@ public class Step : MonoBehaviour
 
     float angle = 0;   
 
-    
-
     void Update()
     {   
-        if(Time.timeScale != 1) return;
         MoveSideToSide();
     }
 
@@ -21,7 +18,7 @@ public class Step : MonoBehaviour
     void MoveSideToSide()
     {
         transform.position = new Vector2(Mathf.Sin(angle) * distance, transform.position.y);
-        angle += velocity / 100;
+        angle += velocity / 100 * Time.timeScale;
     }
 
 
