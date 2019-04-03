@@ -8,7 +8,6 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-
     public TextMeshProUGUI scoreText;
 
     public TextMeshProUGUI bestValueText;
@@ -152,6 +151,4 @@ public class GameManager : MonoBehaviour
     public void CloseHowToPanel(){
          HowToPlayPanel.SetActive(false);
     }
-
-
 }

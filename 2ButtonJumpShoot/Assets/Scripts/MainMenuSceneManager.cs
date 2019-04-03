@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using AccessibilityInputSystem;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,11 +9,16 @@ public class MainMenuSceneManager : MonoBehaviour
     private void Start()
     {
         ColorChanger.SetRandomBackgroundColor();
+        Time.timeScale = 1f;
     }
 
     public void StartGame()
     {
-        SceneManager.LoadScene("MainScene");
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null) { 
+            player.transform.SetParent(BasePlayerManager.Instance.playerParent);
+            SceneManager.LoadScene("MainScene");
+        }
     }
 
     public void ExitGame()
@@ -28,6 +34,6 @@ public class MainMenuSceneManager : MonoBehaviour
 
     public void ResetInput()
     {
-        // TODO
+        BasePlayerManager.Instance.RemovePlayer();
     }
 }

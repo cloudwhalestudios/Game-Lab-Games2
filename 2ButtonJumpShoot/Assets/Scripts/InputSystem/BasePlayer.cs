@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace AccessibilityInputSystem
 {
     [Serializable]
-    public abstract class BasePlayer : MonoBehaviour
+    public abstract class BasePlayer
     {
         private static int NEXT_PLAYER_ID = 0;
 
@@ -29,7 +27,7 @@ namespace AccessibilityInputSystem
 
             if (BasePlayerManager.Instance?.playerPrefab != null)
             {
-                PGameObject = Instantiate(BasePlayerManager.Instance.playerPrefab);
+                PGameObject = UnityEngine.Object.Instantiate(BasePlayerManager.Instance.playerPrefab);
             }
             else
             {
@@ -46,9 +44,9 @@ namespace AccessibilityInputSystem
             }
         }
 
-        private void OnDestroy()
+        public virtual void Destroy()
         {
-            DestroyImmediate(PGameObject);
+            UnityEngine.Object.DestroyImmediate(PGameObject);
         }
     }
 }

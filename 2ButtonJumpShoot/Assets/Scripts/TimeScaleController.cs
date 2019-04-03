@@ -19,7 +19,7 @@ public class TimeScaleController : MonoBehaviour
 
     float unpausedTimeScale = 0f;
 
-    public bool IsPaused() => Time.timeScale == pauseTimeScale;
+    public bool IsPaused => Time.timeScale == pauseTimeScale;
 
     void Awake()
     {

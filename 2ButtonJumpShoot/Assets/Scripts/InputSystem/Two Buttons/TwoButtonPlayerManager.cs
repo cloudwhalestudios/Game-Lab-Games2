@@ -36,7 +36,7 @@ namespace AccessibilityInputSystem
 
                 if (key != KeyCode.None)
                 {
-                    if (players.Count >= maxPlayers)
+                    if (players?.Count >= maxPlayers)
                     {
                         print("Reached player limit " + players.Count);
                         return;
@@ -48,11 +48,11 @@ namespace AccessibilityInputSystem
                         newPlayer_primaryKey = key;
                         newPlayer_secondaryKey = KeyCode.None;
                         // TODO add text
-                        NewPlayerIsBeingAdded("", new KeyEventSpecifier("Primary", newPlayer_primaryKey));
+                        NewPlayerIsBeingAdded($"P{players.Count + 1}", new KeyEventSpecifier("Primary", newPlayer_primaryKey));
                     }
                     else
                     {
-                        if (key == newPlayer_primaryKey || playerKeyBindings[key] != null)
+                        if (key == newPlayer_primaryKey || playerKeyBindings.ContainsKey(key))
                         {
                             // Key already in use
                             NewPlayerKeyIsInUse("", new KeyEventSpecifier("", key));

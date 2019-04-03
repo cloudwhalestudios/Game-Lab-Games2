@@ -9,6 +9,8 @@ namespace AccessibilityInputSystem
     {
         public class MainMenuController : BaseMenuController
         {
+            [SerializeField, ReadOnly] private bool isReady = false;
+
             public void Start()
             {
                 MenuManager.Instance.SetActiveMenu(this);
@@ -27,15 +29,17 @@ namespace AccessibilityInputSystem
                 BasePlayerManager.PlayerRemoved -= PlayerManager_PlayerWasRemoved;
             }
 
-            private void PlayerManager_NewPlayerAdded(int total)
+            private void PlayerManager_NewPlayerAdded(BasePlayer player)
             {
-                if (total != 1) return;
+                if (isReady) return;
+                isReady = true;
                 MenuManager.Instance.StartIndicating();
             }
 
             private void PlayerManager_PlayerWasRemoved(int total)
             {
                 if (total != 0) return;
+                isReady = false;
                 MenuManager.Instance.StartIndicating(false);
             }
         }

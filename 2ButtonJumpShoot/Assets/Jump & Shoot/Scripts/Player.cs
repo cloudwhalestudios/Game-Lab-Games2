@@ -1,9 +1,9 @@
-﻿using System;
+﻿using AccessibilityInputSystem;
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : ActiveInputHandler
 {
     public static event Action PlayerJumped;
     public static event Action PlayerShot;
@@ -16,8 +16,15 @@ public class Player : MonoBehaviour
     }
     PlayerState currentState;
 
+    enum InputMode
+    {
+        Disabled, Menu, Game
+    }
+    InputMode currentInputMode = InputMode.Disabled;
+
     public Transform playerParentTransform;
-  
+    [SerializeField] private Vector3 spawnPosition = new Vector3(0, 3, 0);
+
     [Space]
     public GameObject fx_Shoot_1;
     public GameObject fx_Shoot_2;
@@ -33,7 +40,11 @@ public class Player : MonoBehaviour
     TrailRenderer trailRenderer;
     BoxCollider2D bc2D;
 
-    float previousPosXofParent;
+    float previousPosX;
+    float previousPosYofParent;
+
+    bool jump = false;
+    bool shoot = false;
 
     bool isDead = false;
 
@@ -48,6 +59,8 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         bc2D = GetComponent<BoxCollider2D>();
         trailRenderer = GetComponent<TrailRenderer>();
+        //playerParentTransform = BasePlayerManager.Instance.playerParent;
+
     }
 
     void Start()
@@ -56,6 +69,79 @@ public class Player : MonoBehaviour
         RightEnd = GameManager.Instance.GetComponent<GetDisplayBound>().Right;
 
         InitPlayer();
+    }
+
+    public void InitPlayer()
+    {
+        trailRenderer.startWidth = transform.localScale.x;
+        trailRenderer.endWidth = transform.localScale.x;
+
+        currentState = PlayerState.Falling;
+        rb.velocity = new Vector2(0, 0);
+
+        transform.position = spawnPosition;
+
+        isDead = false;
+        jump = false;
+        shoot = false;
+
+        hasCrossedPlatform = false;
+        isOnPlatform = false;
+
+        rb.isKinematic = false;
+        bc2D.enabled = true;
+    }
+
+    void UpdateInputMode()
+    {
+        //Debug.Log("Is paused/menu: " + GameManager.Instance != null && TimeScaleController.Instance != null && !TimeScaleController.Instance.IsPaused);
+        if (GameManager.Instance != null && TimeScaleController.Instance != null && !TimeScaleController.Instance.IsPaused)
+        {
+            currentInputMode = InputMode.Game;
+        }
+        else
+        {
+            currentInputMode = InputMode.Menu;
+        }
+    }
+
+    protected override void TBPrimary_InputEvent(KeyCode primaryKey)
+    {
+        UpdateInputMode();
+
+        switch (currentInputMode)
+        {
+            case InputMode.Menu:
+                // Select Button
+
+                break;
+            case InputMode.Game:
+                if (currentState == PlayerState.Standing)
+                {
+                    jump = true;
+                }
+                else if (currentState == PlayerState.Jumping)
+                {
+                    shoot = true;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected override void TBSecondary_InputEvent(KeyCode secondaryKey)
+    {
+        UpdateInputMode();
+        switch (currentInputMode)
+        {
+            case InputMode.Game:
+                // Pause Game
+                GameManager.Instance.Pause();
+                break;
+            default:
+                break;
+        }
     }
 
     void PlayerStartedJumping()
@@ -91,53 +177,36 @@ public class Player : MonoBehaviour
         }
     }
 
-    void InitPlayer()
-    {
-        trailRenderer.startWidth = transform.localScale.x;
-        trailRenderer.endWidth = transform.localScale.x;
-
-        currentState = PlayerState.Falling;
-        rb.velocity = new Vector2(0, 0);
-    }
-
     void Update()
     {
-        GetInput();
+        if (jump)
+        {
+            Jump();
+            jump = false;
+        }
+        if (shoot)
+        {
+            StartCoroutine(Shoot());
+            AudioManager.Instance.PlaySound(AudioManager.Instance.Fly);
+            shoot = false;
+        }
+
         BounceAtWall();
         DeadCheck();
 
-        previousPosXofParent = transform.parent.transform.position.x;
+        previousPosX = transform.position.x;
 
         if (currentState == PlayerState.Jumping)
         {
             transform.Rotate(Vector3.forward * Time.unscaledDeltaTime * rb.velocity.x * (-30));
 
-            if (transform.position.y >= playerParentTransform.position.y + StepManager.Instance.DistanceToNextStep)
+            if (transform.position.y >= previousPosYofParent + 1f + StepManager.Instance.DistanceToNextStep)
             {
                 PlayerHasCrossedPlatform();
+                bc2D.enabled = true;
             }
         }
     }
-
-
-
-    void GetInput()
-    {
-        // TODO change to primary
-        if (Input.GetMouseButtonDown(1))
-        {
-            if (currentState == PlayerState.Standing)
-            {
-                Jump();
-            }
-            else if (currentState == PlayerState.Jumping)
-            {
-                StartCoroutine(Shoot());
-                AudioManager.Instance.PlaySound(AudioManager.Instance.Fly);
-            }
-        }
-    }
-
 
     void BounceAtWall()
     {
@@ -154,15 +223,16 @@ public class Player : MonoBehaviour
         }
     }
 
-
     void Jump()
     {
         AudioManager.Instance.PlaySound(AudioManager.Instance.Jump);
         PlayerStartedJumping();
         JumpEffect();
 
-        float parentVelocity = (transform.parent.transform.position.x - previousPosXofParent) / Time.deltaTime;
-        rb.velocity = new Vector2(parentVelocity, jumpSpeed);
+        previousPosYofParent = transform.parent.transform.position.y;
+
+        float horizontalVelocity = (transform.position.x - previousPosX) / Time.deltaTime;
+        rb.velocity = new Vector2(horizontalVelocity, jumpSpeed);
 
         currentState = PlayerState.Jumping;
 
@@ -189,8 +259,6 @@ public class Player : MonoBehaviour
             rb.velocity = Vector2.zero;
 
             Destroy(Instantiate(fx_Dead, transform.position, Quaternion.identity), 1.0f);
-
-
             GameManager.Instance.GameOver();
         }
     }
@@ -236,8 +304,13 @@ public class Player : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.tag == "Step" && currentState == PlayerState.Falling && rb.velocity == Vector2.zero)
+        if (isActiveAndEnabled && other.gameObject.tag == "Step" && rb.velocity == Vector2.zero)
         {
+            if (playerParentTransform == null)
+            {
+                playerParentTransform = BasePlayerManager.Instance.playerParent;
+            }
+
             PlayerHasLandedOnPlatform();
 
             Destroy(Instantiate(fx_Land, transform.position, Quaternion.identity), 0.5f);
@@ -255,6 +328,7 @@ public class Player : MonoBehaviour
 
     void OnCollisionExit2D(Collision2D other)
     {
+        if (!isActiveAndEnabled) return;
         StepManager.Instance.MakeStep();
         StepDestroyEffect(other);
 

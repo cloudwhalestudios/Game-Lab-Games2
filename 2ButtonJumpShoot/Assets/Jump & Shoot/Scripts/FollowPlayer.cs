@@ -14,6 +14,12 @@ public class FollowPlayer : MonoBehaviour
 
     void LateUpdate()
     {
+        if (PlayerObj == null)
+        {
+            PlayerObj = GameObject.FindGameObjectWithTag("Player");
+            return;
+        }
+
         Vector3 targetPosition = PlayerObj.transform.TransformPoint(new Vector3(0, 0, -10));
         targetPosition = new Vector2(targetPosition.x, targetPosition.y + yOffset); 
         if (targetPosition.y < transform.position.y) return;

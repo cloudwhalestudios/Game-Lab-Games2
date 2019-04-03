@@ -10,14 +10,19 @@ namespace AccessibilityInputSystem
         [Serializable]
         public struct KeyEventSpecifier
         {
-            string specifier;
-            KeyCode key;
+            string _specifier;
+            KeyCode _key;
+
+            public string Specifier { get => _specifier; private set => _specifier = value; }
+            public KeyCode Key { get => _key; private set => _key = value; }
 
             public KeyEventSpecifier(string specifier, KeyCode key)
             {
-                this.specifier = specifier;
-                this.key = key;
+                _specifier = specifier;
+                _key = key;
             }
+
+            
         }
 
         public static event Action<BasePlayer> NewPlayerAdded;
@@ -50,6 +55,9 @@ namespace AccessibilityInputSystem
             {
                 Instance = this;
                 DontDestroyOnLoad(this);
+
+                playerKeyBindings = new Dictionary<KeyCode, BasePlayer>();
+                players = new List<BasePlayer>();
             }
             else
             {
@@ -66,6 +74,15 @@ namespace AccessibilityInputSystem
 
         protected void Update()
         {
+            if (players?.Count >= maxPlayers)
+            {
+                shouldCheckForNewPlayer = false;
+            }
+            else if (players?.Count == 0)
+            {
+                shouldCheckForNewPlayer = true;
+            }
+
             if (shouldCheckForNewPlayer)
             {
                 CheckForNewPlayer();
@@ -101,9 +118,13 @@ namespace AccessibilityInputSystem
             PlayerRemoved?.Invoke(players.Count);
         }
 
-        protected virtual void RemovePlayer(KeyCode keyCode)
+        public virtual void RemovePlayer()
         {
-            var player = playerKeyBindings[keyCode];
+            RemovePlayer(players[players.Count - 1].Keys[0]);
+        }
+        public virtual void RemovePlayer(KeyCode keyCode)
+        {
+            var player = playerKeyBindings?[keyCode];
             if (player == null) return;
 
             // Remove from key mapping lookup
@@ -116,7 +137,7 @@ namespace AccessibilityInputSystem
             players.Remove(player);
 
             // Cleanup
-            Destroy(player);
+            player.Destroy();
 
             PlayerWasRemoved();
         }

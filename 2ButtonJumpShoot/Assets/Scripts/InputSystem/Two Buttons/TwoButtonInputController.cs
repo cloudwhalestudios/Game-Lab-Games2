@@ -8,8 +8,8 @@ namespace AccessibilityInputSystem
     {
         public class TwoButtonInputController : BaseInputController
         {
-            public InputKeyEvent primary;
-            public InputKeyEvent secondary;
+            public InputKeyEvent primary = new InputKeyEvent();
+            public InputKeyEvent secondary = new InputKeyEvent();
 
             public override void SetControls(params KeyCode[] keys)
             {
@@ -18,8 +18,11 @@ namespace AccessibilityInputSystem
                     throw new System.ArgumentNullException(nameof(keys));
                 }
 
-                primary = new InputKeyEvent(keys[0]);
-                secondary = new InputKeyEvent(keys[1]);
+                primary.Key = keys[0];
+                secondary.Key = keys[1];
+
+                inputKeyEvents.Add(primary);
+                inputKeyEvents.Add(secondary);
             }
         }
     }
