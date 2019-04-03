@@ -5,6 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class MainSceneManager : MonoBehaviour
 {
+    private void Start()
+    {
+        ColorChanger.SetRandomBackgroundColor();
+    }
+
     public void ReturnToMainMenu()
     {
         SceneManager.LoadScene("MainMenuScene");

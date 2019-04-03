@@ -35,8 +35,6 @@ public class Player : MonoBehaviour
 
     float previousPosXofParent;
 
-    float hueValue;
-
     bool isDead = false;
 
     bool hasCrossedPlatform = false;
@@ -58,9 +56,6 @@ public class Player : MonoBehaviour
         RightEnd = GameManager.Instance.GetComponent<GetDisplayBound>().Right;
 
         InitPlayer();
-
-        hueValue = UnityEngine.Random.Range(0, 10) / 10.0f;
-        ChangeBackgroundColor();
     }
 
     void PlayerStartedJumping()
@@ -216,7 +211,7 @@ public class Player : MonoBehaviour
         yield return new WaitForSecondsRealtime(0.5f);
 
         ShootEffect2();
-        ChangeBackgroundColor();
+        ColorChanger.ChangeBackgroundColor();
 
         rb.isKinematic = false;
         rb.velocity = new Vector2(0, -shootSpeed / Time.timeScale);
@@ -229,7 +224,7 @@ public class Player : MonoBehaviour
     void ShootEffect1()
     {
         GameObject tempObj = Instantiate(fx_Shoot_1, transform.position, Quaternion.identity);
-        tempObj.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.HSVToRGB(hueValue, 0.6f, 0.8f);
+        tempObj.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.HSVToRGB(ColorChanger.hueValue, 0.6f, 0.8f);
         Destroy(tempObj, 1.0f);
     }
 
@@ -272,16 +267,5 @@ public class Player : MonoBehaviour
         GameObject fxObj = Instantiate(fx_StepDestroy, stepCollision.gameObject.transform.position, Quaternion.identity);
         fxObj.transform.localScale = stepCollision.transform.localScale;
         Destroy(fxObj, 0.5f);
-    }
-
-    void ChangeBackgroundColor()
-    {
-        Camera.main.backgroundColor = Color.HSVToRGB(hueValue, 0.6f, 0.8f);
-        hueValue += 0.1f;
-
-        if (hueValue >= 1)
-        {
-            hueValue = 0;
-        }
     }
 }

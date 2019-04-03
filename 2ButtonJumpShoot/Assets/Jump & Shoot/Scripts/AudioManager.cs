@@ -38,7 +38,7 @@ public class AudioManager : MonoBehaviour
         }
         else
         {
-            DestroyImmediate(this);
+            DestroyImmediate(gameObject);
         }
     }
 

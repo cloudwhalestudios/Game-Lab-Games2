@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class IntroSceneManager : MonoBehaviour {
     void Start()
     {
+        ColorChanger.SetRandomBackgroundColor();
         StartCoroutine(GoToMainScene());
     }
 
