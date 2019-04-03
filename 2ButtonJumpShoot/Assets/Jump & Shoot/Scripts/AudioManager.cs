@@ -35,13 +35,9 @@ public class AudioManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(this);
-            DontDestroyOnLoad(gameMusic);
-            DontDestroyOnLoad(gameMusicFiltered);
         }
         else
         {
-            DestroyImmediate(gameMusic);
-            DestroyImmediate(gameMusicFiltered);
             DestroyImmediate(this);
         }
     }
