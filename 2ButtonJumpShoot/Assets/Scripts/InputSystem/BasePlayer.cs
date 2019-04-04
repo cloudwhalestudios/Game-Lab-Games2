@@ -24,6 +24,7 @@ namespace AccessibilityInputSystem
         {
             // Set the ID
             ID = NEXT_PLAYER_ID++;
+            Name = name;
 
             if (BasePlayerManager.Instance?.playerPrefab != null)
             {

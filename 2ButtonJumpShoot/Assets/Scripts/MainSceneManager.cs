@@ -8,18 +8,19 @@ public class MainSceneManager : MonoBehaviour
 
     private void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
         ColorChanger.SetRandomBackgroundColor();
     }
 
     public void ReturnToMainMenu()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
         player.transform.SetParent(BasePlayerManager.Instance.playerParent);
         SceneManager.LoadScene("MainMenuScene");
     }
 
     public void Restart()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
         player.transform.SetParent(BasePlayerManager.Instance.playerParent);
         GameManager.Instance.Restart();
     }

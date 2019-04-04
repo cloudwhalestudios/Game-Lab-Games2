@@ -14,7 +14,13 @@ namespace AccessibilityInputSystem
             public void Start()
             {
                 MenuManager.Instance.SetActiveMenu(this);
-                itemSelectIndicator.gameObject.SetActive(false);
+                if (itemSelectIndicator != null) itemSelectIndicator.gameObject.SetActive(false);
+
+                if (BasePlayerManager.Instance.PlayerCount > 0)
+                {
+                    isReady = true;
+                    MenuManager.Instance.StartIndicating();
+                }
             }
 
             void OnEnable()

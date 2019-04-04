@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: b9af01869b24f4e08bc02f5129750f72, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -264,6 +264,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fx_Land: {fileID: 1396641065617000, guid: 09a7f47c64b05404ba0e5d0d16d29424, type: 3}
+  spawnPosition: {x: 0, y: 3, z: 0}
 --- !u!114 &5681228342431939811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -276,7 +277,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6881b5bf8316940cf8a9871122380173, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentState: 0
   playerParentTransform: {fileID: 0}
+  spawnPosition: {x: 0, y: 3, z: 0}
   fx_Shoot_1: {fileID: 1940939989076994, guid: 333ebb3c089444faf9431b842e2c6d34, type: 3}
   fx_Shoot_2: {fileID: 1953380681395524, guid: dfefaef5b24e64b99b74c5354a8ff455, type: 3}
   fx_Jump: {fileID: 1344669955215974, guid: b905cd30f7a044751b931bf3b9e46060, type: 3}
@@ -286,6 +289,8 @@ MonoBehaviour:
   fx_Dead: {fileID: 1437769490711066, guid: 9c5351e909b1e4ea1872f2d1d29641a4, type: 3}
   jumpSpeed: 20
   shootSpeed: 40
+  jump: 0
+  shoot: 0
 --- !u!114 &4465396040007618393
 MonoBehaviour:
   m_ObjectHideFlags: 0

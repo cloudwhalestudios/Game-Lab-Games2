@@ -3,24 +3,18 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class Player : ActiveInputHandler
+public class Player : MonoBehaviour
 {
     public static event Action PlayerJumped;
     public static event Action PlayerShot;
     public static event Action<Vector3> PlayerLandedOnPlatform;
     public static event Action PlayerCrossedPlatform;
 
-    enum PlayerState
+    public enum PlayerState
     {
         Standing, Jumping, Falling
     }
-    PlayerState currentState;
-
-    enum InputMode
-    {
-        Disabled, Menu, Game
-    }
-    InputMode currentInputMode = InputMode.Disabled;
+    [HideInInspector] public PlayerState currentState;
 
     public Transform playerParentTransform;
     [SerializeField] private Vector3 spawnPosition = new Vector3(0, 3, 0);
@@ -43,8 +37,8 @@ public class Player : ActiveInputHandler
     float previousPosX;
     float previousPosYofParent;
 
-    bool jump = false;
-    bool shoot = false;
+    [HideInInspector] public bool jump = false;
+    [HideInInspector] public bool shoot = false;
 
     bool isDead = false;
 
@@ -90,58 +84,6 @@ public class Player : ActiveInputHandler
 
         rb.isKinematic = false;
         bc2D.enabled = true;
-    }
-
-    void UpdateInputMode()
-    {
-        //Debug.Log("Is paused/menu: " + GameManager.Instance != null && TimeScaleController.Instance != null && !TimeScaleController.Instance.IsPaused);
-        if (GameManager.Instance != null && TimeScaleController.Instance != null && !TimeScaleController.Instance.IsPaused)
-        {
-            currentInputMode = InputMode.Game;
-        }
-        else
-        {
-            currentInputMode = InputMode.Menu;
-        }
-    }
-
-    protected override void TBPrimary_InputEvent(KeyCode primaryKey)
-    {
-        UpdateInputMode();
-
-        switch (currentInputMode)
-        {
-            case InputMode.Menu:
-                // Select Button
-
-                break;
-            case InputMode.Game:
-                if (currentState == PlayerState.Standing)
-                {
-                    jump = true;
-                }
-                else if (currentState == PlayerState.Jumping)
-                {
-                    shoot = true;
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    protected override void TBSecondary_InputEvent(KeyCode secondaryKey)
-    {
-        UpdateInputMode();
-        switch (currentInputMode)
-        {
-            case InputMode.Game:
-                // Pause Game
-                GameManager.Instance.Pause();
-                break;
-            default:
-                break;
-        }
     }
 
     void PlayerStartedJumping()

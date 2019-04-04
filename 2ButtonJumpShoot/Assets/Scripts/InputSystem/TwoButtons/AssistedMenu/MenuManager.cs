@@ -36,22 +36,15 @@ namespace AccessibilityInputSystem
                 }
                 else
                 {
-                    DestroyImmediate(this);
+                    DestroyImmediate(gameObject);
                 }
             }
-            private void OnEnable()
-            {
-                SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
-            }
-            private void OnDisable()
-            {
-                SceneManager.activeSceneChanged -= SceneManager_activeSceneChanged;
-            }
 
-            private void SceneManager_activeSceneChanged(Scene arg0, Scene arg1)
-            {
-                StopAllCoroutines();
-            }
+            private void OnEnable() => SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
+            private void OnDisable() => SceneManager.activeSceneChanged -= SceneManager_activeSceneChanged;
+            private void SceneManager_activeSceneChanged(Scene from, Scene to) => Cleanup();
+            public void SetActiveMenu(BaseMenuController menuController) => activeMenuController = menuController;
+            void Cleanup() => StopAllCoroutines();
 
             void OnDestroy()
             {
@@ -59,16 +52,7 @@ namespace AccessibilityInputSystem
                 Cleanup();
             }
 
-            void Cleanup()
-            {
-                StopAllCoroutines();
-            }
 
-            public void SetActiveMenu(BaseMenuController menuController)
-            {
-                activeMenuController = menuController;
-                buttons = new List<Button>(menuController.GetComponentsInChildren<Button>());
-            }
 
             public void ShowMenu(bool startMoving = true)
             {
@@ -94,10 +78,10 @@ namespace AccessibilityInputSystem
                     switch (activeMenuController.indicatorMode)
                     {
                         case BaseMenuController.IndicatorMode.Single:
-                            activeMenuController.itemSelectIndicator.gameObject.SetActive(true);
+                            if (activeMenuController.itemSelectIndicator != null) activeMenuController.itemSelectIndicator.gameObject.SetActive(true);
                             break;
                         case BaseMenuController.IndicatorMode.RowAndSingle:
-                            activeMenuController.rowSelectIndicator.gameObject.SetActive(true);
+                            if (activeMenuController.rowSelectIndicator != null) activeMenuController.rowSelectIndicator.gameObject.SetActive(true);
                             break;
                         case BaseMenuController.IndicatorMode.ColumnAndSingle:
                             break;
@@ -110,7 +94,7 @@ namespace AccessibilityInputSystem
                 }
                 else if (menuSelector != null)
                 {
-                    activeMenuController.itemSelectIndicator.gameObject.SetActive(false);
+                    if (activeMenuController.itemSelectIndicator != null) activeMenuController.itemSelectIndicator?.gameObject.SetActive(false);
                     StopCoroutine(menuSelector);
                     menuSelector = null;
                     HighlightButton(buttons[selectedButtonIndex], true);
@@ -141,11 +125,9 @@ namespace AccessibilityInputSystem
 
             IEnumerator MenuSelection()
             {
-                selectedButtonIndex = activeMenuController.startingIndex;
-
-                yield return null;
                 Button selectedButton;
-
+                buttons = new List<Button>(activeMenuController.buttonParent.GetComponentsInChildren<Button>());
+                selectedButtonIndex = Mathf.Clamp(activeMenuController.startingIndex, 0, buttons.Count - 1);
 
                 while (true)
                 {
@@ -210,48 +192,81 @@ namespace AccessibilityInputSystem
 
             void IndicateButton(Button btn)
             {
-                var btnRect = btn.GetComponent<RectTransform>();
-                var posX = new Vector2(btnRect.localPosition.x, 0);
-                var posY = new Vector2(0, btnRect.localPosition.y);
+                try
+                {
 
-                if (singleSelection)
-                {
-                    activeMenuController.itemSelectIndicator.anchoredPosition = posX + posY + activeMenuController.itemIndicatorOffset;
-                }
-                else
-                {
-                    switch (activeMenuController.indicatorMode)
+                    var btnRect = btn.GetComponent<RectTransform>();
+                    var posX = new Vector2(btnRect.localPosition.x, 0);
+                    var posY = new Vector2(0, btnRect.localPosition.y);
+
+                    if (singleSelection)
                     {
-                        case BaseMenuController.IndicatorMode.Single:
-                            singleSelection = true;
-                            IndicateButton(btn);
-                            break;
-                        case BaseMenuController.IndicatorMode.RowAndSingle:
-                            activeMenuController.rowSelectIndicator.anchoredPosition = posY + activeMenuController.rowIndicatorOffset;
-                            break;
-                        case BaseMenuController.IndicatorMode.ColumnAndSingle:
-                            break;
-                        case BaseMenuController.IndicatorMode.RowAndColumn:
-                            break;
-                        default:
-                            break;
+                        if (activeMenuController.itemSelectIndicator != null)
+                            activeMenuController.itemSelectIndicator.anchoredPosition = posX + posY + activeMenuController.itemIndicatorOffset;
                     }
+                    else
+                    {
+                        switch (activeMenuController.indicatorMode)
+                        {
+                            case BaseMenuController.IndicatorMode.Single:
+                                singleSelection = true;
+                                IndicateButton(btn);
+                                break;
+                            case BaseMenuController.IndicatorMode.RowAndSingle:
+                                if (activeMenuController.rowSelectIndicator != null)
+                                    activeMenuController.rowSelectIndicator.anchoredPosition = posY + activeMenuController.rowIndicatorOffset;
+                                break;
+                            case BaseMenuController.IndicatorMode.ColumnAndSingle:
+                                break;
+                            case BaseMenuController.IndicatorMode.RowAndColumn:
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                catch (System.Exception)
+                {
+                    return;
                 }
             }
 
             void HighlightButton(Button btn, bool revert = false)
             {
-                if (revert && btn?.image?.sprite != null)
+                try
                 {
-                    if (lastDefaultStateSprite != null) btn.image.sprite = lastDefaultStateSprite;
-                    if (lastDefaultColor != null) btn.image.color = lastDefaultColor;
+                    if (btn.transition == Selectable.Transition.SpriteSwap)
+                    {
+                        if (revert && btn?.image?.sprite != null)
+                        {
+                            if (lastDefaultStateSprite != null) btn.image.sprite = lastDefaultStateSprite;
+                            if (lastDefaultColor != null) btn.image.color = lastDefaultColor;
+                            return;
+                        }
+
+                        lastDefaultStateSprite = btn.image.sprite;
+                        lastDefaultColor = btn.image.color;
+                        btn.image.sprite = btn.spriteState.highlightedSprite;
+                        btn.image.color = Color.white;
+                    }
+                    else if (btn.transition == Selectable.Transition.Animation)
+                    {
+                        if (btn?.animator != null)
+                        {
+                            if (revert && btn?.animationTriggers?.normalTrigger != null)
+                            {
+                                btn.animator.SetBool(btn.animationTriggers.normalTrigger, true);
+                                return;
+                            }
+                            btn.animator.SetBool(btn.animationTriggers.highlightedTrigger, true);
+                        }
+                    }
+                }
+                catch (System.Exception)
+                {
+
                     return;
                 }
-
-                lastDefaultStateSprite = btn.image.sprite;
-                lastDefaultColor = btn.image.color;
-                btn.image.sprite = btn.spriteState.highlightedSprite;
-                btn.image.color = Color.white;
             }
         }
     }

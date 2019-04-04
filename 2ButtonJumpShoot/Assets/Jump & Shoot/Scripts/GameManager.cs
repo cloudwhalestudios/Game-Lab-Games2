@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using AccessibilityInputSystem.TwoButtons;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,8 +14,14 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI bestValueText;
     public TextMeshProUGUI bestText;
 
+    [Space]
     public GameObject GameOverPanel;
+    public GameObject GameOverButtonsParent;
     public GameObject PauseMenuPanel;
+    public GameObject PauseMenuButtonsParent;
+    public GameMenuController menuController;
+
+    [Space]
     public GameObject GameOverEffectPanel;
 
     public GameObject StartEffectPanel;
@@ -77,29 +84,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
     public void GameOver()
     {
         isDead = true;
-        StartCoroutine(GameOverCoroutine());
-    }
 
-    IEnumerator GameOverCoroutine()
-    {
-        Time.timeScale = 0.1f;
         GameOverEffectPanel.SetActive(true);
         scoreText.color = Color.white;
         bestText.color = Color.gray;
         bestValueText.color = Color.gray;
 
-        yield return new WaitForSecondsRealtime(0.5f);
-        Time.timeScale = 0.02f;
-        SetGameOverActive(true);
+        SetGameOverActive();
 
-        yield return new WaitForSecondsRealtime(2.5f);
         TimeScaleController.Instance.Pause(true);
 
-        yield break;
     }
 
     public void Pause()
@@ -110,7 +107,7 @@ public class GameManager : MonoBehaviour
         bestText.color = Color.gray;
         bestValueText.color = Color.gray;
 
-        SetPauseMenuActive(true);
+        SetPauseMenuActive();
         AudioManager.Instance.PlaySound(AudioManager.Instance.Alternate);
     }
     public void Resume()
@@ -128,14 +125,20 @@ public class GameManager : MonoBehaviour
 
     void SetPauseMenuActive(bool activate = true)
     {
-        PauseMenuPanel.SetActive(activate);
+        menuController.SetMenu(PauseMenuPanel, PauseMenuButtonsParent);
         GameOverPanel.SetActive(false);
+
+        if (activate) MenuManager.Instance.ShowMenu();
+        else MenuManager.Instance.HideMenu();
     }
 
     void SetGameOverActive(bool activate = true)
     {
-        GameOverPanel.SetActive(activate);
+        menuController.SetMenu(GameOverPanel, GameOverButtonsParent);
         PauseMenuPanel.SetActive(false);
+
+        if (activate) MenuManager.Instance.ShowMenu();
+        else MenuManager.Instance.HideMenu();
     }
 
     public void Restart()

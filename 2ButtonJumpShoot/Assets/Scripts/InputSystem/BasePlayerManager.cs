@@ -37,6 +37,7 @@ namespace AccessibilityInputSystem
         public static event Action<int> PlayerRemoved;
 
         public static BasePlayerManager Instance { get; private set; }
+        public int PlayerCount => players.Count;
 
         [Header("Configuration")]
         [SerializeField] public GameObject playerPrefab;
@@ -48,6 +49,14 @@ namespace AccessibilityInputSystem
         [SerializeField, ReadOnly] protected Dictionary<KeyCode, BasePlayer> playerKeyBindings;
         [SerializeField, ReadOnly] protected List<BasePlayer> players;
 
+        public BasePlayer GetPlayer()
+        {
+            if (players.Count >= 1) {
+                return GetPlayer(players[0].Keys[0]);
+            }
+            return null;
+        }
+        public BasePlayer GetPlayer(KeyCode keyCode) => playerKeyBindings?[keyCode];
 
         protected void Awake()
         {
@@ -101,27 +110,12 @@ namespace AccessibilityInputSystem
             return KeyCode.None;
         }
 
-        protected void NewPlayerWasAdded(BasePlayer player)
-        {
-            NewPlayerAdded?.Invoke(player);
-        }
-        protected void NewPlayerIsBeingAdded(string message, params KeyEventSpecifier[] keyEventSpecifiers)
-        {
-            NewPlayerBeingAdded?.Invoke(message, keyEventSpecifiers);
-        }
-        protected void NewPlayerKeyIsInUse(string message, KeyEventSpecifier keyEventSpecifier)
-        {
-            NewPlayerKeyInUse?.Invoke(message, keyEventSpecifier);
-        }
-        protected void PlayerWasRemoved()
-        {
-            PlayerRemoved?.Invoke(players.Count);
-        }
+        protected void NewPlayerWasAdded(BasePlayer player) => NewPlayerAdded?.Invoke(player);
+        protected void NewPlayerIsBeingAdded(string message, params KeyEventSpecifier[] keyEventSpecifiers) => NewPlayerBeingAdded?.Invoke(message, keyEventSpecifiers);
+        protected void NewPlayerKeyIsInUse(string message, KeyEventSpecifier keyEventSpecifier) => NewPlayerKeyInUse?.Invoke(message, keyEventSpecifier);
+        protected void PlayerWasRemoved() => PlayerRemoved?.Invoke(players.Count);
 
-        public virtual void RemovePlayer()
-        {
-            RemovePlayer(players[players.Count - 1].Keys[0]);
-        }
+        public virtual void RemovePlayer() { if (PlayerCount > 0) RemovePlayer(players[players.Count - 1].Keys[0]); }
         public virtual void RemovePlayer(KeyCode keyCode)
         {
             var player = playerKeyBindings?[keyCode];

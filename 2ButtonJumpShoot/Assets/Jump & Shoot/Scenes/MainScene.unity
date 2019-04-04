@@ -314,7 +314,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &63734397
 GameObject:
@@ -1542,6 +1542,7 @@ GameObject:
   - component: {fileID: 307575623}
   - component: {fileID: 307575622}
   - component: {fileID: 307575625}
+  - component: {fileID: 307575626}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -1608,7 +1609,7 @@ RectTransform:
   - {fileID: 615197822}
   - {fileID: 433472381}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1637,6 +1638,30 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+--- !u!114 &307575626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 307575621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58db28ad8c32cdd489214f43bbf3878f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  menuContainer: {fileID: 1716364454}
+  buttonParent: {fileID: 127295673}
+  indicatorMode: 0
+  rowSelectIndicator: {fileID: 0}
+  columnSelectIndicator: {fileID: 0}
+  itemSelectIndicator: {fileID: 0}
+  startingIndex: 0
+  buttonsPerRow: 0
+  buttonsPerColumn: 0
+  itemIndicatorOffset: {x: 0, y: 0}
+  columnIndicatorOffset: {x: 0, y: 0}
+  rowIndicatorOffset: {x: 0, y: 0}
 --- !u!1 &335576291
 GameObject:
   m_ObjectHideFlags: 0
@@ -2444,6 +2469,53 @@ MonoBehaviour:
   PlayerObj: {fileID: 0}
   smoothTime: 0.3
   yOffset: 5
+--- !u!1 &586045697
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 586045699}
+  - component: {fileID: 586045698}
+  m_Layer: 0
+  m_Name: MenuManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &586045698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586045697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 291da86a68bd768469a12e8929fabf2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoInterval: 1
+  activeMenuController: {fileID: 0}
+  selectedButtonIndex: 0
+  buttons: []
+--- !u!4 &586045699
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586045697}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &615197821
 GameObject:
   m_ObjectHideFlags: 0
@@ -3177,7 +3249,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &774865065
 GameObject:
@@ -3404,7 +3476,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &799803911
 GameObject:
@@ -3464,7 +3536,7 @@ Transform:
   - {fileID: 1026107539}
   - {fileID: 222496086}
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &827740361
 GameObject:
@@ -3754,7 +3826,10 @@ MonoBehaviour:
   bestValueText: {fileID: 1385624807}
   bestText: {fileID: 63734399}
   GameOverPanel: {fileID: 1000091204}
+  GameOverButtonsParent: {fileID: 481691049}
   PauseMenuPanel: {fileID: 1716364454}
+  PauseMenuButtonsParent: {fileID: 127295673}
+  menuController: {fileID: 307575626}
   GameOverEffectPanel: {fileID: 1518906978}
   StartEffectPanel: {fileID: 615197821}
   HowToPlayPanel: {fileID: 433472380}
