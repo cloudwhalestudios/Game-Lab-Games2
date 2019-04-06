@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainSceneManager : MonoBehaviour
+public class MainSceneController : MonoBehaviour
 {
     GameObject player;
 
