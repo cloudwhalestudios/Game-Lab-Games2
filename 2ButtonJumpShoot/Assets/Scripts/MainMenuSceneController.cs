@@ -1,6 +1,4 @@
 ﻿using AccessibilityInputSystem;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -26,7 +24,7 @@ public class MainMenuSceneController : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #elif UNITY_WEBPLAYER
-        Application.OpenURL("../");
+        WebGLIntegration.WebGLRedirect.OpenPlatform();
 #else
         Application.Quit();
 #endif
