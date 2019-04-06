@@ -8,14 +8,16 @@ namespace WebGLIntegration
 {
     public class WebGLRedirect : MonoBehaviour
     {
+#if UNITY_WEBPLAYER        
         private static void Redirect(string url)
         {
             JSLib.Redirect(Config.BASE_URL + url);
         }
 
-        public void OpenPlatform()
+        public static void OpenPlatform()
         {
             Redirect(Config.PLATFORM_URL);
         }
+#endif
     }
 }

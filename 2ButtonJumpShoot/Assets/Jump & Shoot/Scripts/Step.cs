@@ -41,6 +41,8 @@ public class Step : MonoBehaviour
             transform.position = new Vector3(transform.position.x, originalPosition_Y - YChangeValue);
             yield return 0;
         }
+
+
         yield break;
     }
 

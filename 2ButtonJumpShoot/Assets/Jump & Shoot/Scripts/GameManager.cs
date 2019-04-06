@@ -59,6 +59,10 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        UpdateTopScoreText();
+
+        scoreText.text = "0";
+
         StartCoroutine(StartEffect());
     }
 
@@ -76,12 +80,23 @@ public class GameManager : MonoBehaviour
         score += value;
         scoreText.text = score.ToString();
 
-        if (score > PlayerPrefs.GetInt("BestScore", 0))
+        SetTopScore(score);
+    }
+
+    public void SetTopScore(int score)
+    {
+        if (score > UserProgress.Current.TopScore)
         {
-            bestValueText.text = score.ToString();
-            PlayerPrefs.SetInt("BestScore", score);
+            UserProgress.Current.TopScore = score;
+            UpdateTopScoreText();
+
             AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.Highscore);
         }
+    }
+
+    void UpdateTopScoreText()
+    {
+        bestValueText.text = UserProgress.Current.TopScore.ToString();
     }
 
     public void GameOver()
@@ -96,7 +111,6 @@ public class GameManager : MonoBehaviour
         SetGameOverActive();
 
         TimeScaleController.Instance.Pause(true);
-
     }
 
     public void Pause()

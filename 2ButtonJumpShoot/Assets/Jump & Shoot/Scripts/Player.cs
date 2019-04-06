@@ -72,6 +72,7 @@ public class Player : MonoBehaviour
 
         currentState = PlayerState.Falling;
         rb.velocity = new Vector2(0, 0);
+        transform.rotation = Quaternion.identity;
 
         transform.position = spawnPosition;
 
@@ -105,7 +106,6 @@ public class Player : MonoBehaviour
 
     void PlayerStartedShooting()
     {
-        AudioManager.Instance.PlaySound(AudioManager.Instance.Shoot);
         PlayerShot?.Invoke();
     }
 
@@ -113,7 +113,6 @@ public class Player : MonoBehaviour
     {
         if (!isOnPlatform)
         {
-            AudioManager.Instance.PlaySound(AudioManager.Instance.BassCrash);
             isOnPlatform = true;
             PlayerLandedOnPlatform?.Invoke(transform.position);
         }
@@ -129,7 +128,6 @@ public class Player : MonoBehaviour
         if (shoot)
         {
             StartCoroutine(Shoot());
-            AudioManager.Instance.PlaySound(AudioManager.Instance.Fly);
             shoot = false;
         }
 
@@ -140,11 +138,18 @@ public class Player : MonoBehaviour
 
         if (currentState == PlayerState.Jumping)
         {
-            transform.Rotate(Vector3.forward * Time.unscaledDeltaTime * rb.velocity.x * (-30));
+            if (!TimeScaleController.Instance.IsPaused)
+            {
+                transform.Rotate(Vector3.forward * Time.unscaledDeltaTime * rb.velocity.x * (-30));
+            }
 
-            if (transform.position.y >= previousPosYofParent + 1f + StepManager.Instance.DistanceToNextStep)
+            if (transform.position.y >= previousPosYofParent + StepManager.Instance.DistanceToNextStep)
             {
                 PlayerHasCrossedPlatform();
+            }
+
+            if (PlayerIsFalling())
+            {
                 bc2D.enabled = true;
             }
         }
@@ -183,7 +188,6 @@ public class Player : MonoBehaviour
         transform.SetParent(playerParentTransform);
     }
 
-
     void JumpEffect()
     {
         GameObject effectObj = Instantiate(fx_Jump, transform.position, Quaternion.identity);
@@ -207,11 +211,13 @@ public class Player : MonoBehaviour
 
     IEnumerator Shoot()
     {
+        AudioManager.Instance.PlaySound(AudioManager.Instance.Shoot);
+
         PlayerStartedShooting();
 
-        transform.rotation = Quaternion.identity;
-
         currentState = PlayerState.Falling;
+
+        transform.rotation = Quaternion.identity;
 
         ShootEffect1();
 
@@ -219,6 +225,8 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(0, 0);
 
         yield return new WaitForSecondsRealtime(0.5f);
+
+        AudioManager.Instance.PlaySound(AudioManager.Instance.Fly);
 
         ShootEffect2();
         ColorChanger.ChangeBackgroundColor();
@@ -246,18 +254,25 @@ public class Player : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (isActiveAndEnabled && other.gameObject.tag == "Step")
+        if (isActiveAndEnabled && other.gameObject.tag == "Step" && PlayerIsFalling())
         {
             if (playerParentTransform == null)
             {
                 playerParentTransform = BasePlayerManager.Instance.playerParent;
             }
 
+            AudioManager.Instance.PlaySound(AudioManager.Instance.BassCrash);
+
             PlayerHasLandedOnPlatform();
 
             Destroy(Instantiate(fx_Land, transform.position, Quaternion.identity), 0.5f);
 
             rb.velocity = new Vector2(0, 0);
+            transform.rotation = Quaternion.identity;
+            var pos = transform.position;
+            pos.y = other.transform.position.y + 0.5f;
+            transform.position = pos;
+
             currentState = PlayerState.Standing;
 
             transform.SetParent(other.gameObject.transform);
@@ -268,11 +283,18 @@ public class Player : MonoBehaviour
         }
     }
 
+    bool PlayerIsFalling()
+    {
+        return (currentState == PlayerState.Falling || (currentState == PlayerState.Jumping && rb.velocity.y <= 0));
+    }
+
     void OnCollisionExit2D(Collision2D other)
     {
         if (!isActiveAndEnabled) return;
         StepManager.Instance.MakeStep();
         StepDestroyEffect(other);
+
+        //Debug.Log("Is player parent: " + (other.transform.Equals(transform.parent)));
 
         Destroy(other.gameObject, 0.1f);
     }

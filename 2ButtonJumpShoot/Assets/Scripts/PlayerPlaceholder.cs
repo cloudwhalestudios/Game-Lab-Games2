@@ -28,6 +28,7 @@ public class PlayerPlaceholder : MonoBehaviour
         trailRenderer.endWidth = transform.localScale.x;
 
         rb.velocity = new Vector2(0, 0);
+        transform.rotation = Quaternion.identity;
 
         transform.position = spawnPosition;
 
@@ -44,7 +45,9 @@ public class PlayerPlaceholder : MonoBehaviour
             hasLanded = true;
             AudioManager.Instance.PlaySound(AudioManager.Instance.BassCrash);
             Destroy(Instantiate(fx_Land, transform.position, Quaternion.identity), 0.5f);
+
             rb.velocity = new Vector2(0, 0);
+            transform.rotation = Quaternion.identity;
 
             transform.SetParent(other.gameObject.transform);
 
