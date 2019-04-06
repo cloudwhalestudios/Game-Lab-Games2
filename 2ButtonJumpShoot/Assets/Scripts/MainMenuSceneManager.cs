@@ -26,7 +26,7 @@ public class MainMenuSceneManager : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #elif UNITY_WEBPLAYER
-        Application.OpenURL("google.com");
+        Application.OpenURL("../");
 #else
         Application.Quit();
 #endif

@@ -948,13 +948,13 @@ MonoBehaviour:
   - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
   - regularTypeface: {fileID: 0}
-    italicTypeface: {fileID: 0}
+    italicTypeface: {fileID: 11400000, guid: 0bf7e07d44a529e4fad593a5cfabc920, type: 2}
   - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
   - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
-  - regularTypeface: {fileID: 0}
-    italicTypeface: {fileID: 0}
+  - regularTypeface: {fileID: 11400000, guid: f3e4b7db1cac0e54ea07a415451d5ca9, type: 2}
+    italicTypeface: {fileID: 11400000, guid: ca6cc69240e8dff41ab9b26afbdc2765, type: 2}
   - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
   - regularTypeface: {fileID: 0}

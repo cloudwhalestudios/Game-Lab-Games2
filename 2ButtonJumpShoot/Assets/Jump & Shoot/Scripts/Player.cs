@@ -246,7 +246,7 @@ public class Player : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (isActiveAndEnabled && other.gameObject.tag == "Step" && rb.velocity == Vector2.zero)
+        if (isActiveAndEnabled && other.gameObject.tag == "Step")
         {
             if (playerParentTransform == null)
             {
