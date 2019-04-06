@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
+    public static Player Instance { get; private set; }
 
     public GameObject fx_Dead;
     public GameObject fx_ColorChange;
@@ -30,9 +31,22 @@ public class Player : MonoBehaviour
     public int YdecelerationForce;
     public int YspeedMax;
     float hueValue;
-    bool isDead = false;
+    public bool isDead = false;
 
-    void Start()
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            DestroyImmediate(Instance);
+            Instance = this;
+        }
+    }
+
+        void Start()
     {
         GameManagerObj = GameObject.Find("GameManager");
         rb = GetComponent<Rigidbody2D>();
@@ -54,10 +68,10 @@ public class Player : MonoBehaviour
 
     void MovePlayer()
     {
-
         Vector2 pos = transform.position;
         pos.x = Mathf.Cos(angle) * (GameManagerObj.GetComponent<DisplayManager>().RIGHT * 0.9f);
-        pos.y += 0.002f;
+        //pos.y += 0.002f; This usually made the player move up slowly
+        //But we don't want there to be consequences when Jeroen does not move.
         transform.position = pos;
         angle += Time.deltaTime * Xspeed;
 
@@ -107,6 +121,11 @@ public class Player : MonoBehaviour
 
             source.PlayOneShot(DeadClip, 1);
         }
+
+        if (other.gameObject.tag == "CheckpointDetector")
+        {
+            return;
+        }
     }
 
 
@@ -128,5 +147,11 @@ public class Player : MonoBehaviour
         Camera.main.backgroundColor = Color.HSVToRGB(hueValue, 0.6f, 0.8f);
     }
 
-
+    void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
 }

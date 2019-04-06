@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Item_ColorChange
   - Obstacle
+  - Checkpoint
+  - CheckpointDetector
   layers:
   - Default
   - TransparentFX

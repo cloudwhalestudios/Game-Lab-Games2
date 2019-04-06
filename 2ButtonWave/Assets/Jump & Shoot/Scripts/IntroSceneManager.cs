@@ -11,6 +11,7 @@ public class IntroSceneManager : MonoBehaviour {
 
     IEnumerator GoToMainScene()
     {
+        AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.SplashScreen);
         yield return new WaitForSeconds(2);
         SceneManager.LoadScene("MainMenuSceneWave");
         yield break;

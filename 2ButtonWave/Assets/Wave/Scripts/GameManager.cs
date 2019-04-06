@@ -7,6 +7,7 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
 
     int score = 0;
     public TextMeshProUGUI CurrentScoreTextTMPro;
@@ -21,9 +22,21 @@ public class GameManager : MonoBehaviour
 
     static int PlayCount;
 
+    //public static bool Instance { get; internal set; }
 
     void Awake()
     {
+        //PlayerPrefs.SetInt("BestScore", 1); DEBUGGING FOR SFX
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            DestroyImmediate(Instance);
+            Instance = this;
+        }
         Application.targetFrameRate = 60;
 
 
@@ -32,6 +45,14 @@ public class GameManager : MonoBehaviour
 
         BestScoreTextTMPro.text = PlayerPrefs.GetInt("BestScore", 0).ToString();
         StartCoroutine(FadeIn());
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     void Update()
@@ -56,13 +77,15 @@ public class GameManager : MonoBehaviour
 
     public void addScore()
     {
+
+        AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.Score);
         score++;
         CurrentScoreTextTMPro.text = score.ToString();
-
         if (score > PlayerPrefs.GetInt("BestScore", 0))
         {
             PlayerPrefs.SetInt("BestScore", score);
             BestScoreTextTMPro.text = PlayerPrefs.GetInt("BestScore", 0).ToString();
+            AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.Highscore);
         }
     }
 
@@ -81,7 +104,6 @@ public class GameManager : MonoBehaviour
         GameOverPanel.SetActive(true);
         yield break;
     }
-
 
     public void Restart()
     {
