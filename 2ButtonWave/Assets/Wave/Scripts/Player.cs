@@ -16,22 +16,26 @@ public class Player : MonoBehaviour
     public AudioClip ItemClip;
     AudioSource source;
 
-
-
-
-
     Rigidbody2D rb;
 
     float angle = 0;
 
     [Space]
     public float Xspeed;
+    public float MoveToCheckpointSpeed;
 
     public int YaccelerationForce;
     public int YdecelerationForce;
     public int YspeedMax;
     float hueValue;
     public bool isDead = false;
+
+    public bool hasArrivedAtCheckpoint;
+    public Vector2 playerPosition;
+
+    private CheckPointDetector TheCheckpointDetector;
+
+    private float CheckpointArrivalY;
 
     void Awake()
     {
@@ -52,7 +56,7 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         source = GetComponent<AudioSource>();
 
-
+        TheCheckpointDetector = FindObjectOfType<CheckPointDetector>();
 
         hueValue = Random.Range(0, 10) / 10.0f;
         SetBackgroundColor();
@@ -63,25 +67,38 @@ public class Player : MonoBehaviour
     {
         if (isDead) return;
         MovePlayer();
+
+        CheckpointArrivalY = TheCheckpointDetector.CurrentSelectedCheckpointPositionY;
+        if (transform.position.y == CheckpointArrivalY)
+        {
+            hasArrivedAtCheckpoint = true;
+        } else
+        {
+            hasArrivedAtCheckpoint = false;
+        }
     }
 
 
     void MovePlayer()
     {
         Vector2 pos = transform.position;
+        
         pos.x = Mathf.Cos(angle) * (GameManagerObj.GetComponent<DisplayManager>().RIGHT * 0.9f);
         //pos.y += 0.002f; This usually made the player move up slowly
         //But we don't want there to be consequences when Jeroen does not move.
         transform.position = pos;
         angle += Time.deltaTime * Xspeed;
-
-
+        
         if (Input.GetMouseButton(0))
         {
+            // Click must happen once, then player moved automatically
+            // if (!hasArrivedAtCheckpoint && transform.position.y <= CheckpointArrivalY) { }
+            transform.position = Vector2.MoveTowards(transform.position, TheCheckpointDetector.CurrentSelectedCheckpointPosition, (MoveToCheckpointSpeed / 4));
+            /*   \/ Old player movement \/
             if (rb.velocity.y < YspeedMax)
             {
                 rb.AddForce(new Vector2(0, YaccelerationForce));
-            }
+            }*/
         }
         else
         {
