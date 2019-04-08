@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
+    public static Player Instance { get; private set; }
 
     public GameObject fx_Dead;
     public GameObject fx_ColorChange;
@@ -14,8 +15,6 @@ public class Player : MonoBehaviour
     public AudioClip DeadClip;
     public AudioClip ItemClip;
     AudioSource source;
-
-
 
 
 
@@ -30,7 +29,27 @@ public class Player : MonoBehaviour
     public int YdecelerationForce;
     public int YspeedMax;
     float hueValue;
-    bool isDead = false;
+    public bool isDead = false;
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            DestroyImmediate(Instance);
+            Instance = this;
+        }
+    }
+    void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
 
     void Start()
     {
@@ -62,7 +81,7 @@ public class Player : MonoBehaviour
         angle += Time.deltaTime * Xspeed;
 
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetKey(KeyCode.RightArrow))
         {
             if (rb.velocity.y < YspeedMax)
             {
@@ -80,7 +99,6 @@ public class Player : MonoBehaviour
                 rb.velocity = new Vector2(rb.velocity.x, 0);
             }
         }
-
     }
 
 
@@ -106,6 +124,7 @@ public class Player : MonoBehaviour
             GameManagerObj.GetComponent<GameManager>().Gameover();
 
             source.PlayOneShot(DeadClip, 1);
+            AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.Death);
         }
     }
 

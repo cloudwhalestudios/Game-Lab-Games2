@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
 
     static int PlayCount;
 
+    public bool GameOverMenuRestartActive;
+    public bool GameOverMenuMainMenuActive;
 
     void Awake()
     {
@@ -32,14 +34,26 @@ public class GameManager : MonoBehaviour
 
         BestScoreTextTMPro.text = PlayerPrefs.GetInt("BestScore", 0).ToString();
         StartCoroutine(FadeIn());
+
     }
 
     void Update()
     {
         if (touchToMoveTextObj.activeSelf == false) return;
-        if (Input.GetMouseButton(0))
+        if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             touchToMoveTextObj.SetActive(false);
+        }
+        if (GameOverPanel.activeSelf == true)
+        {
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                Restart();
+            }
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                SceneManager.LoadScene("MainMenuSceneWave");
+            }
         }
     }
 
@@ -51,11 +65,9 @@ public class GameManager : MonoBehaviour
         yield break;
     }
 
-
-    
-
     public void addScore()
     {
+        AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.Score);
         score++;
         CurrentScoreTextTMPro.text = score.ToString();
 
@@ -63,10 +75,14 @@ public class GameManager : MonoBehaviour
         {
             PlayerPrefs.SetInt("BestScore", score);
             BestScoreTextTMPro.text = PlayerPrefs.GetInt("BestScore", 0).ToString();
+            AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.Highscore);
         }
     }
 
-
+    public void Restart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
     public void Gameover()
     {
         StartCoroutine(GameoverCoroutine());
@@ -80,11 +96,5 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(0.5f);
         GameOverPanel.SetActive(true);
         yield break;
-    }
-
-
-    public void Restart()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
