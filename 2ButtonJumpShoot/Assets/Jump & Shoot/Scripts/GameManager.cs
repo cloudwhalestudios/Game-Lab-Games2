@@ -122,7 +122,7 @@ public class GameManager : MonoBehaviour
         bestValueText.color = Color.gray;
 
         SetPauseMenuActive();
-        AudioManager.Instance.PlaySound(AudioManager.Instance.Alternate);
+        AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.UI_cancel);
     }
     public void Resume()
     {
@@ -134,7 +134,6 @@ public class GameManager : MonoBehaviour
         bestValueText.color = color;
 
         SetPauseMenuActive(false);
-        AudioManager.Instance.PlaySound(AudioManager.Instance.Alternate);
     }
 
     void SetPauseMenuActive(bool activate = true)
@@ -157,7 +156,6 @@ public class GameManager : MonoBehaviour
 
     public void Restart()
     {
-        AudioManager.Instance.PlaySound(AudioManager.Instance.Alternate);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 

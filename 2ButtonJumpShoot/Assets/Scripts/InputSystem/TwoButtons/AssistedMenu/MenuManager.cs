@@ -138,6 +138,7 @@ namespace AccessibilityInputSystem
                     selectedButton = buttons[selectedButtonIndex];
 
                     // Indicate and Highlight
+                    AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.UI);
                     IndicateButton(selectedButton);
 
                     if (singleSelection)

@@ -21,6 +21,10 @@ public class AudioManager : MonoBehaviour
     public AudioSource BassCrashHighscore;
     public AudioSource Highscore;
     public AudioSource Alternate;
+    public AudioSource Splash;
+    public AudioSource UI;
+    public AudioSource UI_cancel;
+    public AudioSource UI_confirm;
 
     [Header("Sound effects")]
     public float lowPitchRange = 0.75f;
