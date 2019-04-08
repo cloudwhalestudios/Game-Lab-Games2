@@ -6,22 +6,15 @@ mergeInto(LibraryManager.library, {
 
     RedirectWithParams: function(str_location, str_paramsJson) {
         var jsonObject = JSON.parse(Pointer_stringify(str_paramsJson));
-        var location = Pointer_stringify(str_location);
-        var questionmark = false;
-        for(var key in jsonObject) {
-            if (jsonObject.hasOwnProperty(key)) {
-                // Attach to url
-                if (!questionmark) {
-                    location += "?";
-                }
-                else {
-                    location += "&";
-                }
-                location += key + "=" + jsonObject[key];
-            }
-        }
-        console.warn("Redirecting to " + encodeURI(location));
-        window.location.href = encodeURI(location);
+        var location = encodeURI(Pointer_stringify(str_location) + '?');
+        console.log("received location: " + location + " | received json: " + JSON.stringify(jsonObject, null, 4));
+
+        var url = Object.keys(jsonObject).map(function(k) {
+            return encodeURIComponent(k) + '=' + encodeURIComponent(jsonObject[k])
+        }).join('&');
+
+        console.log("Redirecting to " . location  + "?" . url);
+        window.location.href = encodeURI(location + url);
     },
 
     Refresh: function() {
@@ -29,11 +22,9 @@ mergeInto(LibraryManager.library, {
     },
 
     GetParams: function () {
-        var params = {};
-        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-            params[key] = value;
-        });
-        var jsonString = JSON.stringify(params);
+        var search = location.search.substring(1);
+        var jsonObject = JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g,'":"') + '"}', function(key, value) { return key===""?value:decodeURIComponent(value) });
+        var jsonString = JSON.stringify(jsonObject);
 
         console.log("Read parameters as json:" + jsonString);
 
