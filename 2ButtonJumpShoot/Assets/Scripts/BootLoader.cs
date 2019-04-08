@@ -12,7 +12,11 @@ public class BootLoader : MonoBehaviour
     {
         if (!lookedForPlatformPreferences)
         {
-            PlatformPreferences.Current = JsonUtility.FromJson<PlatformPreferences>(WebGLParameters.GetParameterJson());
+            var jsonString = WebGLParameters.GetParameterJson();
+            Debug.Log("Loaded parameters: " + JsonUtility.ToJson(jsonString,true));
+
+            PlatformPreferences.Current = JsonUtility.FromJson<PlatformPreferences>(jsonString);
+
             if (PlatformPreferences.Current?.Keys != null)
             {
                 BasePlayerManager.Instance.AddPlayer(PlatformPreferences.Current.Keys);

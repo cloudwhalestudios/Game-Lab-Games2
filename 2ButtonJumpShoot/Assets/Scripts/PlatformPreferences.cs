@@ -9,7 +9,7 @@ using WebGLIntegration;
 public class PlatformPreferences
 {
     static PlatformPreferences current;
-    static bool hasLoaded;
+    static bool hasLoaded = false;
 
     [SerializeField] bool completedSetup;
 
@@ -31,6 +31,7 @@ public class PlatformPreferences
         {
             if (!hasLoaded)
             {
+                Debug.Log("Setting up platform preferences: " + value + " (Json: " + JsonUtility.ToJson(value, true) + ")");
                 current = value;
                 hasLoaded = true;
             }

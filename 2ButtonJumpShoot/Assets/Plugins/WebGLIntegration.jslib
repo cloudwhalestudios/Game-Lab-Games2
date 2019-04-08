@@ -1,7 +1,7 @@
 mergeInto(LibraryManager.library, {
 
     Redirect: function(str_location) {
-        window.location.href = Pointer_stringify(str_location);
+        window.location.href = encodeURI(Pointer_stringify(str_location));
     },
 
     RedirectWithParams: function(str_location, str_paramsJson) {
@@ -20,7 +20,8 @@ mergeInto(LibraryManager.library, {
                 location += key + "=" + jsonObject[key];
             }
         }
-        window.location.href = location;
+        console.warn("Redirecting to " + encodeURI(location));
+        window.location.href = encodeURI(location);
     },
 
     Refresh: function() {
@@ -34,9 +35,14 @@ mergeInto(LibraryManager.library, {
         });
         var jsonString = JSON.stringify(params);
 
+        console.log("Read parameters as json:" + jsonString);
+
         var bufferSize = lengthBytesUTF8(jsonString) + 1;
         var buffer = _malloc(bufferSize);
         stringToUTF8(jsonString, buffer, bufferSize);
+
+        console.log("Parameter buffer:" + buffer);
+
         return buffer;
     },
 
