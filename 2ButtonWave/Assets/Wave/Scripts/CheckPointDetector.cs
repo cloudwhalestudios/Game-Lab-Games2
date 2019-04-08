@@ -15,6 +15,9 @@ public class CheckPointDetector : MonoBehaviour
 
     private bool CheckpointsAllCycled;
 
+    public float CheckpointTriggerEnter;
+    public GameObject[] testArray;
+
     void Start()
     {
         StartCoroutine(CycleCheckpoints());
@@ -48,15 +51,9 @@ public class CheckPointDetector : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.tag == "Checkpoint")
-        {/*
-            CurrentCheckpoints = GameObject.FindGameObjectsWithTag("Checkpoint");
-            Check = new CheckPoint[CurrentCheckpoints.Length];
-            CurrentCheckpointsPositions = new Vector2[CurrentCheckpoints.Length];
-            for (int i = 0; i < CurrentCheckpoints.Length; i++)
-            {
-                Check[i] = CurrentCheckpoints[i].GetComponent<CheckPoint>();
-                CurrentCheckpointsPositions[i] = Check[i].transform.position;
-            }*/
+        {
+            CheckpointTriggerEnter = CheckpointTriggerEnter + 1;
+            print(CheckpointTriggerEnter);
         }
 
         if (other.gameObject.tag == "Player")
