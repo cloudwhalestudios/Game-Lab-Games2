@@ -6,18 +6,26 @@ using UnityEngine;
 
 namespace WebGLIntegration
 {
-    public class WebGLRedirect : MonoBehaviour
+    public class WebGLRedirect
     {
-#if UNITY_WEBPLAYER        
         private static void Redirect(string url)
         {
-            JSLib.Redirect(Config.BASE_URL + url);
+#if UNITY_WEBGL
+            JSLib.Redirect(Config.BASE_URL + url + "/");
+#endif
+            Debug.Log($"Should open {Config.BASE_URL + url + "/"} right now");
         }
 
-        public static void OpenPlatform()
+        public static void OpenLauncher()
         {
-            Redirect(Config.PLATFORM_URL);
+            Redirect(Config.LAUNCHER_URL);
         }
+
+        public static void Refresh()
+        {
+#if UNITY_WEBGL
+            JSLib.Refresh();
 #endif
+        }
     }
 }

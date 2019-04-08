@@ -23,15 +23,10 @@ public class MainMenuSceneController : MonoBehaviour
     {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-#elif UNITY_WEBPLAYER
-        WebGLIntegration.WebGLRedirect.OpenPlatform();
+#elif UNITY_WEBGL
+        WebGLIntegration.WebGLRedirect.OpenLauncher();
 #else
         Application.Quit();
 #endif
-    }
-
-    public void ResetInput()
-    {
-        BasePlayerManager.Instance.RemovePlayer();
     }
 }
