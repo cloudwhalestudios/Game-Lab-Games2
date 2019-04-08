@@ -32,7 +32,6 @@ public class TimeScaleController : MonoBehaviour
             DestroyImmediate(Instance);
             Instance = this;
         }
-
         ApplyTimeScale(defaultTimeScale);
     }
 
@@ -72,7 +71,6 @@ public class TimeScaleController : MonoBehaviour
         {
             ApplyTimeScale(defaultTimeScale);
         }
-        //Debug.Log(Time.timeScale);
     }
 
     public void Pause(bool pause = true)

@@ -10,7 +10,7 @@ namespace WebGLIntegration
     {
         private static void Redirect(string url)
         {
-#if UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
             JSLib.Redirect(Config.BASE_URL + url + "/");
 #endif
             Debug.Log($"Should open {Config.BASE_URL + url + "/"} right now");
@@ -23,7 +23,7 @@ namespace WebGLIntegration
 
         public static void Refresh()
         {
-#if UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
             JSLib.Refresh();
 #endif
         }

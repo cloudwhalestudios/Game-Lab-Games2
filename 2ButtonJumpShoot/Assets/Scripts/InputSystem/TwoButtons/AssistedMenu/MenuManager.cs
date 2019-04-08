@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,20 +13,19 @@ namespace AccessibilityInputSystem
         {
             public static MenuManager Instance { get; private set; }
 
-            public float autoInterval;
+            public int direction = 1;
 
-            [SerializeField, ReadOnly] private BaseMenuController activeMenuController;
-            [SerializeField, ReadOnly] private int selectedButtonIndex;
+            [SerializeField, ReadOnly] private BaseMenuController controller;
+            [SerializeField, ReadOnly] private int selectedIndex;
             [SerializeField, ReadOnly] private List<Button> buttons;
 
             Coroutine menuSelector;
+            Coroutine timerUpdateRoutine;
 
             Sprite lastDefaultStateSprite;
             Color lastDefaultColor;
-            bool singleSelection;
 
-            int currentColumn;
-            int currentRow;
+            bool firstTimeAnimation = true;
 
             void Awake()
             {
@@ -42,9 +42,26 @@ namespace AccessibilityInputSystem
 
             private void OnEnable() => SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
             private void OnDisable() => SceneManager.activeSceneChanged -= SceneManager_activeSceneChanged;
+
             private void SceneManager_activeSceneChanged(Scene from, Scene to) => Cleanup();
-            public void SetActiveMenu(BaseMenuController menuController) => activeMenuController = menuController;
-            void Cleanup() => StopAllCoroutines();
+
+            public void SetMenuController(BaseMenuController menuController)
+            {
+                if (controller != null && controller.updateStartIndex) controller.startingIndex = selectedIndex;
+
+                controller = menuController;
+                buttons = new List<Button>(controller.buttonParent.GetComponentsInChildren<Button>());
+                selectedIndex = Mathf.Clamp(controller.startingIndex, 0, buttons.Count - 1);
+                firstTimeAnimation = true;
+            }
+
+            void Cleanup()
+            {
+                if (menuSelector != null) StopCoroutine(menuSelector);
+                menuSelector = null;
+                if (timerUpdateRoutine != null) StopCoroutine(timerUpdateRoutine);
+                timerUpdateRoutine = null;
+            }
 
             void OnDestroy()
             {
@@ -52,21 +69,19 @@ namespace AccessibilityInputSystem
                 Cleanup();
             }
 
-
-
             public void ShowMenu(bool startMoving = true)
             {
-                if (activeMenuController?.menuContainer != null)
+                if (controller?.menuContainer != null)
                 {
-                    activeMenuController.menuContainer.SetActive(true);
+                    controller.menuContainer.SetActive(true);
                     StartIndicating(startMoving);
                 }
             }
             public void HideMenu()
             {
-                if (activeMenuController?.menuContainer != null)
+                if (controller?.menuContainer != null)
                 {
-                    activeMenuController.menuContainer.SetActive(false);
+                    controller.menuContainer.SetActive(false);
                     StartIndicating(false);
                 }
             }
@@ -75,119 +90,248 @@ namespace AccessibilityInputSystem
             {
                 if (indicate)
                 {
-                    switch (activeMenuController.indicatorMode)
-                    {
-                        case BaseMenuController.IndicatorMode.Single:
-                            if (activeMenuController.itemSelectIndicator != null) activeMenuController.itemSelectIndicator.gameObject.SetActive(true);
-                            break;
-                        case BaseMenuController.IndicatorMode.RowAndSingle:
-                            if (activeMenuController.rowSelectIndicator != null) activeMenuController.rowSelectIndicator.gameObject.SetActive(true);
-                            break;
-                        case BaseMenuController.IndicatorMode.ColumnAndSingle:
-                            break;
-                        case BaseMenuController.IndicatorMode.RowAndColumn:
-                            break;
-                        default:
-                            break;
-                    }
-                    menuSelector = StartCoroutine(MenuSelection());
-                }
-                else if (menuSelector != null)
-                {
-                    if (activeMenuController.itemSelectIndicator != null) activeMenuController.itemSelectIndicator?.gameObject.SetActive(false);
-                    StopCoroutine(menuSelector);
-                    menuSelector = null;
-                    HighlightButton(buttons[selectedButtonIndex], true);
-                }
-            }
+                    //Debug.Log(controller?.name + " " + controller?.buttonParent);
 
-            public void SelectButton()
-            {
-                if (!singleSelection)
-                {
-                    singleSelection = true;
+                    if (controller.itemSelectIndicator != null) controller.itemSelectIndicator.gameObject.SetActive(true);
+                    if (controller.itemSelectTimer != null) controller.itemSelectTimer.gameObject.SetActive(true);
+
+                    if (controller.transitionType == BaseMenuController.Transition.Animate) SetupButtonAnimation();
+                    else if (controller.transitionType == BaseMenuController.Transition.Move) SetupButtonIndication();
+                    
+                    menuSelector = StartCoroutine(MenuSelection());
                 }
                 else
                 {
-                    buttons[selectedButtonIndex].onClick.Invoke();
+                    if (controller.itemSelectIndicator != null) controller.itemSelectIndicator?.gameObject.SetActive(false);
+                    if (controller.itemSelectTimer != null) controller.itemSelectTimer.gameObject.SetActive(false);
+                    Cleanup();
+                    HighlightButton(buttons[selectedIndex], true);
                 }
             }
 
-            public bool EnableMultiSelection()
+            private void SetupButtonAnimation()
             {
-                if (!singleSelection) return false;
+                UpdateAnimationSpots();
+                controller.firstSpot.buttonObject.transform.localPosition = controller.firstSpot.localPosition;
+                controller.currentSpot.buttonObject.transform.localPosition = controller.currentSpot.localPosition;
+                controller.lastSpot.buttonObject.transform.localPosition = controller.lastSpot.localPosition;
 
-                selectedButtonIndex = (selectedButtonIndex % activeMenuController.buttonsPerRow) + currentRow * activeMenuController.buttonsPerRow;
-                HighlightButton(buttons[selectedButtonIndex], true);
-                singleSelection = false;
-                return true;
+                controller.firstSpot.buttonObject.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
+                controller.currentSpot.buttonObject.transform.localScale = new Vector3(1f, 1f, 1f);
+                controller.lastSpot.buttonObject.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
+            }
+
+            private void SetupButtonIndication()
+            {
+                IndicateButton(buttons[selectedIndex]);
+            }
+
+            private void UpdateAnimationSpots()
+            {
+                var firstIndex = (selectedIndex + buttons.Count - direction) % buttons.Count;
+                var lastIndex = (selectedIndex + buttons.Count + direction) % buttons.Count;
+
+                var first = buttons[firstIndex].gameObject;
+                var current = buttons[selectedIndex].gameObject;
+                var last = buttons[lastIndex].gameObject;
+
+                controller.firstSpot.buttonObject = first;
+                controller.currentSpot.buttonObject = current;
+                controller.lastSpot.buttonObject = last;
+
+                var canvas = current.GetComponent<Canvas>();
+                if (canvas != null)
+                {
+                    canvas.overrideSorting = true;
+                    canvas.sortingOrder = 10;
+                }
+                canvas = first.GetComponent<Canvas>();
+                if (canvas != null)
+                {
+                    canvas.overrideSorting = false;
+                    canvas.sortingOrder = 0;
+                }
+                canvas = last.GetComponent<Canvas>();
+                if (canvas != null)
+                {
+                    canvas.overrideSorting = false;
+                    canvas.sortingOrder = 0;
+                }
+            }
+
+            public void SelectItem()
+            {
+                //Debug.Log($"Selecting button {buttons[selectedIndex].name} ({selectedIndex})");
+                buttons[selectedIndex].onClick.Invoke();
             }
 
             IEnumerator MenuSelection()
             {
                 Button selectedButton;
-                buttons = new List<Button>(activeMenuController.buttonParent.GetComponentsInChildren<Button>());
-                selectedButtonIndex = Mathf.Clamp(activeMenuController.startingIndex, 0, buttons.Count - 1);
+                yield return null;
+                HighlightButton(buttons[selectedIndex]);
 
                 while (true)
                 {
-                    var buttonsPerColumn = activeMenuController.buttonsPerColumn;
-                    var buttonsPerRow = activeMenuController.buttonsPerRow;
-
-                    singleSelection = singleSelection || activeMenuController.indicatorMode == BaseMenuController.IndicatorMode.Single;
-                    selectedButton = buttons[selectedButtonIndex];
+                    selectedButton = buttons[selectedIndex];
 
                     // Indicate and Highlight
-                    AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.UI);
-                    IndicateButton(selectedButton);
-
-                    if (singleSelection)
+                    //AudioManager.Instance?.PlaySoundNormally(AudioManager.Instance?.Select);
+                    switch (controller.transitionType)
                     {
-                        HighlightButton(selectedButton);
+                        case BaseMenuController.Transition.Move:
+                            IndicateButton(selectedButton);
+                            break;
+                        case BaseMenuController.Transition.Animate:
+                            AnimateButton(selectedButton);
+                            break;
+                        default:
+                            break;
                     }
 
-                    yield return new WaitForSecondsRealtime(autoInterval);
-
-                    if (singleSelection)
+                    HighlightButton(selectedButton);
+                    
+                    if (controller.itemSelectTimer != null)
                     {
-                        // Re-apply default sprite
-                        HighlightButton(selectedButton, true);
-                        selectedButtonIndex++;
 
-                        switch (activeMenuController.indicatorMode)
-                        {
-                            case BaseMenuController.IndicatorMode.Single:
-                                selectedButtonIndex %= buttons.Count;
-                                break;
-                            case BaseMenuController.IndicatorMode.RowAndSingle:
-                                selectedButtonIndex = (selectedButtonIndex % buttonsPerRow) + currentRow * buttonsPerRow;
-                                break;
-                            case BaseMenuController.IndicatorMode.ColumnAndSingle:
-                                break;
-                            case BaseMenuController.IndicatorMode.RowAndColumn:
-                                break;
-                            default:
-                                break;
-                        }
-
+                        yield return timerUpdateRoutine = StartCoroutine(UpdateTimerProgress(PlatformPreferences.Current.MenuProgressionTimer));
                     }
                     else
                     {
-                        switch (activeMenuController.indicatorMode)
+                        yield return new WaitForSecondsRealtime(PlatformPreferences.Current.MenuProgressionTimer);
+                    }
+
+                    HighlightButton(selectedButton, true);
+                    selectedIndex = (selectedIndex + buttons.Count + direction) % buttons.Count;
+                }
+            }
+
+            private void AnimateButton(Button selectedButton)
+            {
+                try
+                {
+                    StartCoroutine(AnimateButtonCoroutine(selectedButton));
+                }
+                catch (Exception)
+                {
+
+                    return;
+                }
+            }
+
+            IEnumerator AnimateButtonCoroutine(Button selectedButton)
+            {
+                // Fade first
+                StartCoroutine(AnimateMoveItem(
+                        controller.firstSpot.buttonObject,
+                        controller.firstSpot.localPosition,
+                        controller.firstSpot.localPosition,
+                        controller.disappearClip,
+                        controller.staticFadedClip,
+                        controller.transitionTime
+                        ));
+                UpdateAnimationSpots();
+
+                // Appear last
+                StartCoroutine(AnimateMoveItem(
+                            controller.lastSpot.buttonObject,
+                            controller.lastSpot.localPosition,
+                            controller.lastSpot.localPosition,
+                            controller.appearClip,
+                            controller.staticSmallClip,
+                            controller.transitionTime
+                        ));
+                
+                // Move to current
+                StartCoroutine(AnimateMoveItem(
+                            controller.currentSpot.buttonObject,
+                            controller.lastSpot.localPosition,
+                            controller.currentSpot.localPosition,
+                            controller.growClip,
+                            controller.staticLargeClip,
+                            controller.transitionTime
+                        ));
+
+                // Move to first
+                StartCoroutine(AnimateMoveItem(
+                            controller.firstSpot.buttonObject,
+                            controller.currentSpot.localPosition,
+                            controller.firstSpot.localPosition,
+                            controller.shrinkClip,
+                            controller.staticSmallClip,
+                            controller.transitionTime
+                        ));
+
+                if (firstTimeAnimation)
+                {
+                    firstTimeAnimation = false;
+                }
+
+                yield return null;
+            }
+
+            IEnumerator AnimateMoveItem(GameObject item, Vector3 startLocation, Vector3 endLocation, AnimationClip transitionClip, AnimationClip staticClip, float transitionTime)
+            {
+                var animation = item.GetComponent<Animation>();
+                if (animation == null)
+                {
+                    animation = item.AddComponent<Animation>();
+                }
+                if (animation.GetClip(transitionClip.name) == null)
+                {
+                    transitionClip.legacy = true;
+                    transitionClip.wrapMode = WrapMode.Once;
+                    animation.AddClip(transitionClip, transitionClip.name);
+                }
+                if (animation.GetClip(staticClip.name) == null)
+                {
+                    staticClip.legacy = true;
+                    staticClip.wrapMode = WrapMode.Once;
+                    animation.AddClip(staticClip, staticClip.name);
+                }
+                animation.Stop();
+
+                if (!firstTimeAnimation)
+                {
+                    animation.Play(transitionClip.name);
+                    animation[transitionClip.name].speed = transitionClip.length / transitionTime;
+
+                    item.transform.localPosition = startLocation;
+                    if (startLocation != endLocation)
+                    {
+                        var elapsedTime = 0f;
+                        while (elapsedTime <= transitionTime)
                         {
-                            case BaseMenuController.IndicatorMode.RowAndSingle: // Row increment
-                                selectedButtonIndex = (selectedButtonIndex + buttonsPerRow) % buttons.Count;
-                                currentRow = Mathf.FloorToInt((float)selectedButtonIndex / buttonsPerRow);
-                                break;
-                            case BaseMenuController.IndicatorMode.ColumnAndSingle:
-                                currentColumn = Mathf.FloorToInt((float)selectedButtonIndex / buttonsPerColumn);
-                                break;
-                            case BaseMenuController.IndicatorMode.RowAndColumn:
-                                break;
-                            default:
-                                break;
+                            yield return null;
+                            elapsedTime += Time.unscaledDeltaTime;
+                            var percentage = Mathf.Clamp01(elapsedTime / transitionTime);
+                            item.transform.localPosition = Vector3.Lerp(startLocation, endLocation, percentage);
                         }
                     }
+                    else
+                    {
+                        yield return new WaitForSecondsRealtime(transitionTime);
+                    }
+                }
+                else
+                {
+                    item.transform.localPosition = endLocation;
+                }
+                
+                animation.Stop();
+                animation.Play(staticClip.name);
+            }
+
+            IEnumerator UpdateTimerProgress(float waitTime)
+            {
+                var elapsedTime = 0f;
+                controller.itemSelectTimer.localScale = new Vector3(0, 1, 1);
+                while (elapsedTime < waitTime)
+                {
+                    yield return null;
+                    elapsedTime += Time.unscaledDeltaTime;
+                    var percentage = Mathf.Clamp01(elapsedTime / waitTime);
+                    controller.itemSelectTimer.localScale = new Vector3(percentage, 1, 1);
                 }
             }
 
@@ -195,38 +339,15 @@ namespace AccessibilityInputSystem
             {
                 try
                 {
-
                     var btnRect = btn.GetComponent<RectTransform>();
                     var posX = new Vector2(btnRect.localPosition.x, 0);
                     var posY = new Vector2(0, btnRect.localPosition.y);
 
-                    if (singleSelection)
-                    {
-                        if (activeMenuController.itemSelectIndicator != null)
-                            activeMenuController.itemSelectIndicator.anchoredPosition = posX + posY + activeMenuController.itemIndicatorOffset;
-                    }
-                    else
-                    {
-                        switch (activeMenuController.indicatorMode)
-                        {
-                            case BaseMenuController.IndicatorMode.Single:
-                                singleSelection = true;
-                                IndicateButton(btn);
-                                break;
-                            case BaseMenuController.IndicatorMode.RowAndSingle:
-                                if (activeMenuController.rowSelectIndicator != null)
-                                    activeMenuController.rowSelectIndicator.anchoredPosition = posY + activeMenuController.rowIndicatorOffset;
-                                break;
-                            case BaseMenuController.IndicatorMode.ColumnAndSingle:
-                                break;
-                            case BaseMenuController.IndicatorMode.RowAndColumn:
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                    if (controller.itemSelectIndicator != null)
+                        controller.itemSelectIndicator.anchoredPosition = posX + posY + controller.itemIndicatorOffset;
+                   
                 }
-                catch (System.Exception)
+                catch (Exception)
                 {
                     return;
                 }
@@ -263,7 +384,7 @@ namespace AccessibilityInputSystem
                         }
                     }
                 }
-                catch (System.Exception)
+                catch (Exception)
                 {
 
                     return;

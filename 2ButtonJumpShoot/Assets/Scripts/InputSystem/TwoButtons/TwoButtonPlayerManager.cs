@@ -13,7 +13,7 @@ namespace AccessibilityInputSystem
             [SerializeField, ReadOnly] private KeyCode newPlayer_primaryKey;
             [SerializeField, ReadOnly] private KeyCode newPlayer_secondaryKey;
 
-            protected override void AddPlayer(params KeyCode[] keyCodes)
+            public override void AddPlayer(params KeyCode[] keyCodes)
             {
                 if (keyCodes?.Length < 2)
                 {

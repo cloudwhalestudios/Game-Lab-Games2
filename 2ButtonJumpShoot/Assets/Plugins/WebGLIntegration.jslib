@@ -1,11 +1,62 @@
 mergeInto(LibraryManager.library, {
 
-    OpenGame: function(str_location) {
+    Redirect: function(str_location) {
         window.location.href = Pointer_stringify(str_location);
     },
 
-    Reload: function() {
+    RedirectWithParams: function(str_location, str_paramsJson) {
+        var jsonObject = JSON.parse(Pointer_stringify(str_paramsJson));
+        var location = Pointer_stringify(str_location);
+        var questionmark = false;
+        for(var key in jsonObject) {
+            if (jsonObject.hasOwnProperty(key)) {
+                // Attach to url
+                if (!questionmark) {
+                    location += "?";
+                }
+                else {
+                    location += "&";
+                }
+                location += key + "=" + jsonObject[key];
+            }
+        }
+        window.location.href = location;
+    },
+
+    Refresh: function() {
         location.reload();
+    },
+
+    GetParams: function () {
+        var params = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+            params[key] = value;
+        });
+        var jsonString = JSON.stringify(params);
+
+        var bufferSize = lengthBytesUTF8(jsonString) + 1;
+        var buffer = _malloc(bufferSize);
+        stringToUTF8(jsonString, buffer, bufferSize);
+        return buffer;
+    },
+
+    SetParams: function(str_paramsJson) {
+        var jsonObject = JSON.parse(Pointer_stringify(str_paramsJson));
+        var searchString = window.location.search = "";
+        var questionmark = false;
+        for(var key in jsonObject) {
+            if (jsonObject.hasOwnProperty(key)) {
+                // Attach to url
+                if (!questionmark) {
+                    searchString += "?";
+                }
+                else {
+                    searchString += "&";
+                }
+                searchString += key + "=" + jsonObject[key];
+            }
+        }
+        window.location.search = searchString;
     },
 
     Crash: function() {

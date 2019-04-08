@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 namespace AccessibilityInputSystem
 {
@@ -9,30 +6,47 @@ namespace AccessibilityInputSystem
     {
         public class MainMenuController : BaseMenuController
         {
+            public bool enableAutomaticIndication = false;
             [SerializeField, ReadOnly] private bool isReady = false;
 
             public void Start()
             {
-                MenuManager.Instance.SetActiveMenu(this);
-                if (itemSelectIndicator != null) itemSelectIndicator.gameObject.SetActive(false);
-
-                if (BasePlayerManager.Instance.PlayerCount > 0)
+                ResetController();
+                if (BasePlayerManager.Instance?.PlayerCount > 0)
                 {
                     isReady = true;
                     MenuManager.Instance.StartIndicating();
                 }
             }
 
+            public void ResetController()
+            {
+                MenuManager.Instance.SetMenuController(this);
+                if (itemSelectIndicator != null)
+                {
+                    itemSelectIndicator.gameObject.SetActive(false);
+                }
+                if (itemSelectTimer != null) itemSelectTimer.localScale = new Vector3(0, 1, 1);
+
+                if (menuContainer != null) menuContainer.SetActive(false);
+            }
+
             void OnEnable()
             {
-                BasePlayerManager.NewPlayerAdded += PlayerManager_NewPlayerAdded;
-                BasePlayerManager.PlayerRemoved += PlayerManager_PlayerWasRemoved;
+                if (enableAutomaticIndication)
+                {
+                    BasePlayerManager.NewPlayerAdded += PlayerManager_NewPlayerAdded;
+                    BasePlayerManager.PlayerRemoved += PlayerManager_PlayerWasRemoved;
+                }
             }
 
             void OnDisable()
             {
-                BasePlayerManager.NewPlayerAdded -= PlayerManager_NewPlayerAdded;
-                BasePlayerManager.PlayerRemoved -= PlayerManager_PlayerWasRemoved;
+                if (enableAutomaticIndication)
+                {
+                    BasePlayerManager.NewPlayerAdded -= PlayerManager_NewPlayerAdded;
+                    BasePlayerManager.PlayerRemoved -= PlayerManager_PlayerWasRemoved;
+                }
             }
 
             private void PlayerManager_NewPlayerAdded(BasePlayer player)

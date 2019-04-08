@@ -1,4 +1,5 @@
 ﻿using AccessibilityInputSystem;
+using AccessibilityInputSystem.TwoButtons;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

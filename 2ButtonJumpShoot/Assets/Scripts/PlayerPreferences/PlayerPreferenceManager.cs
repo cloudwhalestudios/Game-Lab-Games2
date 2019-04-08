@@ -30,10 +30,5 @@ namespace PlayerPreferences
 
             Debug.Log($"Saving data under {storeName}: {templateJson}");
         }
-
-        private void OnApplicationQuit()
-        {
-            PlayerPrefs.Save();
-        }
     }
 }

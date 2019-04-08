@@ -96,7 +96,7 @@ public class PlayerController : ActiveInputHandler
         {
             case InputMode.Menu:
                 // Select Button
-                MenuManager.Instance.SelectButton();
+                MenuManager.Instance.SelectItem();
                 break;
 
             case InputMode.Game:

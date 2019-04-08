@@ -41,7 +41,6 @@ namespace AccessibilityInputSystem
 
             public void Start()
             {
-                AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.UI);
                 if (BasePlayerManager.Instance.PlayerCount > 0)
                 {
                     AddPlayerPlaceholderUI(BasePlayerManager.Instance.GetPlayer());
@@ -50,7 +49,6 @@ namespace AccessibilityInputSystem
 
             private void BasePlayerManager_PlayerRemoved(int newCount)
             {
-                AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.UI_cancel);
                 if (newCount == 0)
                 {
                     WaitingForPlayerInput.SetActive(true);
@@ -66,7 +64,6 @@ namespace AccessibilityInputSystem
                 HideDialog();
 
                 AddPlayerPlaceholderUI(player);
-                AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.UI_confirm);
             }
 
             void AddPlayerPlaceholderUI(BasePlayer player)
@@ -83,13 +80,11 @@ namespace AccessibilityInputSystem
 
             private void BasePlayerManager_NewPlayerKeyInUse(string message, BasePlayerManager.KeyEventSpecifier keySpecifier)
             {
-                AudioManager.Instance.PlaySound(AudioManager.Instance.Alternate);
                 DisplayKeyInUse(keySpecifier.Key.ToString());
             }
 
             private void BasePlayerManager_NewPlayerBeingAdded(string name, BasePlayerManager.KeyEventSpecifier[] keySpecifiers)
             {
-                AudioManager.Instance.PlaySoundNormally(AudioManager.Instance.UI_confirm);
                 WaitingForPlayerInput.SetActive(false);
                 ShowDialog(name, keySpecifiers[0].Specifier + ": " + keySpecifiers[0].Key.ToString(), Color.white);
             }

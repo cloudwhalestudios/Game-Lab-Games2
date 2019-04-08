@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,31 +9,51 @@ namespace AccessibilityInputSystem
     {
         public abstract class BaseMenuController : MonoBehaviour
         {
-            public enum IndicatorMode
+            [Serializable]
+            public class ButtonAnimationSpot
             {
-                Single,
-                RowAndSingle,
-                ColumnAndSingle,
-                RowAndColumn
+                public Vector3 localPosition;
+                [ReadOnly] public GameObject buttonObject;
+            }
+
+            public enum Transition
+            {
+                Move,
+                Animate
             }
 
             public GameObject menuContainer;
             public GameObject buttonParent;
 
-            public IndicatorMode indicatorMode = IndicatorMode.Single;
-            public RectTransform rowSelectIndicator;
-            public RectTransform columnSelectIndicator;
+            [Space]
             public RectTransform itemSelectIndicator;
+            public RectTransform itemSelectTimer;
 
             [Header("Selection Behaviour")]
             public int startingIndex;
-            public int buttonsPerRow;
-            public int buttonsPerColumn;
+            public Transition transitionType;
+            public bool updateStartIndex = false;
 
-            [Header("Offset Tweaking")]
+            [Header("Move Offset Tweaking")]
             public Vector2 itemIndicatorOffset;
-            public Vector2 columnIndicatorOffset;
-            public Vector2 rowIndicatorOffset;
+
+            [Header("Animation Config")]
+            public float transitionTime;
+
+            [Space]
+            public AnimationClip appearClip;
+            public AnimationClip growClip;
+            public AnimationClip shrinkClip;
+            public AnimationClip disappearClip;
+
+            public AnimationClip staticFadedClip;
+            public AnimationClip staticSmallClip;
+            public AnimationClip staticLargeClip;
+            
+            [Space]
+            public ButtonAnimationSpot firstSpot;
+            public ButtonAnimationSpot currentSpot;
+            public ButtonAnimationSpot lastSpot;
         }
     }
 }

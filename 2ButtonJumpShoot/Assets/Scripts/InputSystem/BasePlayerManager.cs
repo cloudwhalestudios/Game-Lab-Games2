@@ -10,8 +10,8 @@ namespace AccessibilityInputSystem
         [Serializable]
         public struct KeyEventSpecifier
         {
-            string _specifier;
-            KeyCode _key;
+            [SerializeField] string _specifier;
+            [SerializeField] KeyCode _key;
 
             public string Specifier { get => _specifier; private set => _specifier = value; }
             public KeyCode Key { get => _key; private set => _key = value; }
@@ -21,8 +21,6 @@ namespace AccessibilityInputSystem
                 _specifier = specifier;
                 _key = key;
             }
-
-            
         }
 
         public static event Action<BasePlayer> NewPlayerAdded;
@@ -37,12 +35,13 @@ namespace AccessibilityInputSystem
         public static event Action<int> PlayerRemoved;
 
         public static BasePlayerManager Instance { get; private set; }
-        public int PlayerCount => players.Count;
+
 
         [Header("Configuration")]
         [SerializeField] public GameObject playerPrefab;
         [SerializeField] public Transform playerParent;
-        [SerializeField] protected bool shouldCheckForNewPlayer;
+        [SerializeField] public bool shouldCheckForNewPlayer;
+        [SerializeField] protected bool disableAutoNewPlayerCheck;
         [SerializeField] protected int maxPlayers = 1;
 
         [Header("Players")]
@@ -67,10 +66,16 @@ namespace AccessibilityInputSystem
 
                 playerKeyBindings = new Dictionary<KeyCode, BasePlayer>();
                 players = new List<BasePlayer>();
+
+                if (playerParent == null)
+                {
+                    playerParent = transform;
+                }
             }
             else
             {
                 Instance.shouldCheckForNewPlayer = shouldCheckForNewPlayer;
+                Instance.disableAutoNewPlayerCheck = disableAutoNewPlayerCheck;
                 DestroyImmediate(gameObject);
             }
         }
@@ -87,7 +92,7 @@ namespace AccessibilityInputSystem
             {
                 shouldCheckForNewPlayer = false;
             }
-            else if (players?.Count == 0)
+            else if (!disableAutoNewPlayerCheck && players?.Count == 0)
             {
                 shouldCheckForNewPlayer = true;
             }
@@ -109,6 +114,8 @@ namespace AccessibilityInputSystem
             }
             return KeyCode.None;
         }
+
+        public int PlayerCount => players.Count;
 
         protected void NewPlayerWasAdded(BasePlayer player) => NewPlayerAdded?.Invoke(player);
         protected void NewPlayerIsBeingAdded(string message, params KeyEventSpecifier[] keyEventSpecifiers) => NewPlayerBeingAdded?.Invoke(message, keyEventSpecifiers);
@@ -137,6 +144,6 @@ namespace AccessibilityInputSystem
         }
 
         protected abstract void CheckForNewPlayer();
-        protected abstract void AddPlayer(params KeyCode[] keyCodes);
+        public abstract void AddPlayer(params KeyCode[] keyCodes);
     }
 }

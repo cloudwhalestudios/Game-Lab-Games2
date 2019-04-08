@@ -8,8 +8,21 @@ namespace AccessibilityInputSystem
     {
         public class TwoButtonInputController : BaseInputController
         {
+            public bool overrideControls = false;
+
+            public KeyCode primaryOverride;
+            public KeyCode secondaryOverride;
+
             public InputKeyEvent primary = new InputKeyEvent();
             public InputKeyEvent secondary = new InputKeyEvent();
+
+            public void Start()
+            {
+                if (overrideControls)
+                {
+                    SetControls(primaryOverride, secondaryOverride);
+                }
+            }
 
             public override void SetControls(params KeyCode[] keys)
             {
