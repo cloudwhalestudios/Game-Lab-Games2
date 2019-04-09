@@ -62,11 +62,6 @@ public class GameController : MonoBehaviour
     void Start()
     {
         InputController.ActiveInputMode = InputController.InputMode.Game;
-        InputController.Game.Primary += OnPrimaryGame;
-        InputController.Game.Secondary += OnSecondaryGame;
-
-        InputController.Pause.Primary += OnPrimaryPause;
-        InputController.Pause.Secondary += OnSecondaryPause;
 
         SpawnPreviewBrick();
 
@@ -87,16 +82,10 @@ public class GameController : MonoBehaviour
 
     void OnDestroy()
     {
-        InputController.Game.Primary -= OnPrimaryGame;
-        InputController.Game.Secondary -= OnSecondaryGame;
-
-        InputController.Pause.Primary -= OnPrimaryPause;
-        InputController.Pause.Secondary -= OnSecondaryPause;
-
         StopAllCoroutines();
     }
 
-    void OnPrimaryGame()
+    public void OnPrimaryGame()
     {
         // Move brick down
         if (isAnimating || isFalling)
@@ -107,20 +96,20 @@ public class GameController : MonoBehaviour
         MoveDown();
     }
 
-    void OnSecondaryGame()
+    public void OnSecondaryGame()
     {
-        TogglePause();
+        Pause();
     }
 
-    void OnPrimaryPause()
+    public void OnPrimaryPause()
     {
         // perform select button action
         buttons[selectedButtonIndex].onClick.Invoke();
     }
 
-    void OnSecondaryPause()
+    public void OnSecondaryPause()
     {
-        Quit();
+        //Quit();
     }
 
     private void SetupPauseMenu()
@@ -131,12 +120,12 @@ public class GameController : MonoBehaviour
 
         if (startPaused)
         {
-            TogglePause();
+            Pause();
         }
     }
 
     // Move to: Menu Handler
-    public void TogglePause()
+    public void Pause(bool pause = true)
     {
         Time.timeScale = 1 - Time.timeScale;
         pauseMenu.SetActive(!pauseMenu.activeInHierarchy);
@@ -158,6 +147,7 @@ public class GameController : MonoBehaviour
             
         }
     }
+
 
     // Move to: Menu Handler
     IEnumerator MenuSelection()
@@ -186,7 +176,7 @@ public class GameController : MonoBehaviour
     {
         if (Time.timeScale == 0)
         {
-            TogglePause();
+            Pause();
         }
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         UserProgress.Current.SetField(new int[0]);
@@ -204,7 +194,7 @@ public class GameController : MonoBehaviour
         // Exit Game
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-#elif UNITY_WEBPLAYER
+#elif UNITY_WEBGL
         Application.OpenURL("google.com");
 #else
         Application.Quit();

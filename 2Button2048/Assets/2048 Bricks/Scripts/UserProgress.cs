@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PlayerPreferences;
+using System;
 using UnityEngine;
 
 public class UserProgress
@@ -27,9 +28,7 @@ public class UserProgress
             if (current != null)
                 return current;
 
-            string progressJson = PlayerPrefs.GetString("UserProgress", "{}");
-            Debug.Log("UserProgress : " + progressJson);
-            current = JsonUtility.FromJson<UserProgress>(progressJson);
+            current = PlayerPreferenceManager.Load<UserProgress>();
 
             return current;
         }
@@ -83,7 +82,6 @@ public class UserProgress
 
     public void Save()
     {
-        string progressJson = JsonUtility.ToJson(this);
-        PlayerPrefs.SetString("UserProgress", progressJson);
+        PlayerPreferenceManager.Save(current);
     }
 }
