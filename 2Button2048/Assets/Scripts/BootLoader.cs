@@ -11,9 +11,9 @@ public class BootLoader : MonoBehaviour
     {
         if (!lookedForPlatformPreferences)
         {
-            var jsonString = WebGLParameters.GetParameterJson();
+            /*var jsonString = WebGLParameters.GetParameterJson();
             Debug.Log("Parameters in unity: " + jsonString);
-            
+            */
         }
     }
 }
