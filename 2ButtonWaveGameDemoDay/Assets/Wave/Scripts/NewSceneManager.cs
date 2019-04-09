@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using WebGLIntegration;
 
 public class NewSceneManager : MonoBehaviour
 {
@@ -42,8 +43,8 @@ public class NewSceneManager : MonoBehaviour
     {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-#elif UNITY_WEBPLAYER
-        Application.OpenURL("../");
+#elif UNITY_WEBGL
+        WebGLRedirect.OpenLauncher();
 #else
         Application.Quit();
 #endif

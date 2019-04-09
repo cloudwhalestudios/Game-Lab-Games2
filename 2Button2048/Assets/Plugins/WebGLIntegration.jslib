@@ -22,10 +22,14 @@ mergeInto(LibraryManager.library, {
     },
 
     GetParams: function () {
-        var search = location.search.substring(1);
-        var jsonObject = JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g,'":"') + '"}', function(key, value) { return key===""?value:decodeURIComponent(value) });
-        var jsonString = JSON.stringify(jsonObject);
-
+	var jsonString = "";
+		if (location.search != "") {
+			var search = location.search.substring(1);
+			if (search != "") {
+				var jsonObject = JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g,'":"') + '"}', function(key, value) { return key===""?value:decodeURIComponent(value) });
+				var jsonString = JSON.stringify(jsonObject);
+			}
+		}
         console.log("Read parameters as json:" + jsonString);
 
         var bufferSize = lengthBytesUTF8(jsonString) + 1;
@@ -35,6 +39,7 @@ mergeInto(LibraryManager.library, {
         console.log("Parameter buffer:" + buffer);
 
         return buffer;
+		
     },
 
     SetParams: function(str_paramsJson) {
