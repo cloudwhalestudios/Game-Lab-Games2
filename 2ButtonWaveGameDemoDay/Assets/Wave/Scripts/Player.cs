@@ -81,7 +81,7 @@ public class Player : MonoBehaviour
         angle += Time.deltaTime * Xspeed;
 
 
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.Keypad6) || Input.GetKeyDown(KeyCode.Joystick1Button0))
         {
             if (rb.velocity.y < YspeedMax)
             {

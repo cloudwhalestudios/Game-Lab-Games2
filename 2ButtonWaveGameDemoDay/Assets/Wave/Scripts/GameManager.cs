@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+
+
         Application.targetFrameRate = 60;
 
 
@@ -39,18 +41,21 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (touchToMoveTextObj.activeSelf == false) return;
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (!Player.Instance.isDead)
         {
-            touchToMoveTextObj.SetActive(false);
+            if (touchToMoveTextObj.activeSelf == false) return;
+            if (Input.GetKeyDown(KeyCode.Keypad6) || Input.GetKeyDown(KeyCode.Joystick1Button0))
+            {
+                touchToMoveTextObj.SetActive(false);
+            }
         }
-        if (GameOverPanel.activeSelf == true)
+        else
         {
-            if (Input.GetKeyDown(KeyCode.RightArrow))
+            if (Input.GetKeyDown(KeyCode.Keypad6) || Input.GetKeyDown(KeyCode.Joystick1Button0))
             {
                 Restart();
             }
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            if (Input.GetKeyDown(KeyCode.Keypad4) || Input.GetKeyDown(KeyCode.Joystick1Button1))
             {
                 SceneManager.LoadScene("MainMenuSceneWave");
             }
