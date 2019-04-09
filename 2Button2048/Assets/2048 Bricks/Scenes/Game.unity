@@ -202,7 +202,7 @@ MonoBehaviour:
   placementTransform: {fileID: 1712815002}
   placementIndicator: {fileID: 1646025482}
   placementStart: 0
-  autoMoveInterval: 1.5
+  autoMoveInterval: 2
   fallSpeed: 15
   nextBrickPoint: {fileID: 65721466}
   brickPrefab: {fileID: 114596421498408170, guid: 0279aa79f0c1f43d5a7e89d4065525b4,

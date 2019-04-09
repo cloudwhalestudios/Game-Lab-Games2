@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/2048 Bricks/Scenes/Boot.unity
+    guid: a3d38e0bcf87ce44c9c4ffcbdc0f46ae
+  - enabled: 1
     path: Assets/2048 Bricks/Scenes/Game.unity
     guid: d72eb4323a55c4c0aa56119edf08f960
   m_configObjects: {}

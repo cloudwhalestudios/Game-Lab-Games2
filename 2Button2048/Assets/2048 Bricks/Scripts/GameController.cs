@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using WebGLIntegration;
 using Random = UnityEngine.Random;
 
 
@@ -204,8 +205,8 @@ public class GameController : MonoBehaviour
         // Exit Game
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-#elif UNITY_WEBPLAYER
-        Application.OpenURL("google.com");
+#elif UNITY_WEBGL
+        WebGLRedirect.OpenLauncher();
 #else
         Application.Quit();
 #endif
