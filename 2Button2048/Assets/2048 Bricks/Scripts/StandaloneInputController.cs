@@ -4,10 +4,10 @@ public class StandaloneInputController : InputController
 {
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Keypad6))
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
             OnPrimary();
 
-        if (Input.GetKeyDown(KeyCode.Keypad4))
+        if (Input.GetKeyDown(KeyCode.RightArrow))
             OnSecondary();
     }
 }
