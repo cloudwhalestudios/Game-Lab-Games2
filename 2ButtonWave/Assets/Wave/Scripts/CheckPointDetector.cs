@@ -54,6 +54,8 @@ public class CheckPointDetector : MonoBehaviour
         {
             CheckpointTriggerEnter = CheckpointTriggerEnter + 1;
             print(CheckpointTriggerEnter);
+            //Here you have to log all checkpoints that enter player's collision box
+            //Maybe list active collision checkpoints in trigger (not triggerEnter), then on trigger exit log them out.
         }
 
         if (other.gameObject.tag == "Player")
