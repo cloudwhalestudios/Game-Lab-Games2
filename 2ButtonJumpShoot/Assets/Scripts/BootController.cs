@@ -32,7 +32,6 @@ public class BootController : MonoBehaviour
 
     private void LoadUserSetup()
     {
-
         BootLoader.LoadPlatformPlayer();
         finishedLoading = true;
     }
@@ -45,7 +44,6 @@ public class BootController : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
         }
-
 
         SceneManager.LoadScene("MainMenuScene");
         yield break;

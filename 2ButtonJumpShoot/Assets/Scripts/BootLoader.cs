@@ -13,7 +13,7 @@ public class BootLoader : MonoBehaviour
         if (!lookedForPlatformPreferences)
         {
             var jsonString = WebGLParameters.GetParameterJson();
-            Debug.Log("Loaded parameters: " + JsonUtility.ToJson(jsonString,true));
+            Debug.Log("Loaded parameters: " + JsonUtility.ToJson(jsonString, true));
 
             PlatformPreferences.Current = JsonUtility.FromJson<PlatformPreferences>(jsonString);
 
