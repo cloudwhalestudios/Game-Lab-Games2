@@ -45,7 +45,7 @@ public class BootController : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        SceneManager.LoadScene("MainMenuScene");
+        SceneManager.LoadScene("Game");
         yield break;
     }
 
