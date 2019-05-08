@@ -32,15 +32,17 @@ mergeInto(LibraryManager.library, {
 
     GetParams: function () {
         var encodedUrl = decodeURI(window.location.toString());
-        var decodedSearchUrl = decodeURI(decodeURI(encodedUrl).split('?')[1]);
+        var jsonString = "";
+        if (encodedUrl.indexOf('?') > -1) {
+            var decodedSearchUrl = decodeURI(decodeURI(encodedUrl).split('?')[1]);
 
-        console.log("Decoded search url = " + decodedSearchUrl);
+            console.log("Decoded search url = " + decodedSearchUrl);
 
-        var jsonObject = JSON.parse(decodedSearchUrl);
-        var jsonString = JSON.stringify(jsonObject);
+            var jsonObject = JSON.parse(decodedSearchUrl);
+            jsonString = JSON.stringify(jsonObject);
 
-        console.log("Read parameters as json: " + jsonString);
-
+            console.log("Read parameters as json: " + jsonString);
+        }
         var bufferSize = lengthBytesUTF8(jsonString) + 1;
         var buffer = _malloc(bufferSize);
         stringToUTF8(jsonString, buffer, bufferSize);
