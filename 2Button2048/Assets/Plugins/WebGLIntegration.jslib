@@ -5,16 +5,25 @@ mergeInto(LibraryManager.library, {
     },
 
     RedirectWithParams: function(str_location, str_paramsJson) {
+        /* // Testing
+        var str_location = 'http://www.cloudwhale.nl/launcher/games/jump-and-shoot/';
+        var str_paramsJson = '{"completedSetup":true,"keys":[97,100],"menuProgressionTimer":2.0}';
+
+        var jsonObject = JSON.parse(str_paramsJson);
+        var baseUrl = encodeURI(str_location + '?');
+        */
         var jsonObject = JSON.parse(Pointer_stringify(str_paramsJson));
-        var location = encodeURI(Pointer_stringify(str_location) + '?');
-        console.log("received location: " + location + " | received json: " + JSON.stringify(jsonObject, null, 4));
+        var baseUrl = encodeURI(Pointer_stringify(str_location) + '?');
 
-        var url = Object.keys(jsonObject).map(function(k) {
-            return encodeURIComponent(k) + '=' + encodeURIComponent(jsonObject[k])
-        }).join('&');
+        console.log("Received target url: " + baseUrl);
+        console.log("Received json: " + JSON.stringify(jsonObject));
 
-        console.log("Redirecting to " . location  + "?" . url);
-        window.location.href = encodeURI(location + url);
+        var paramUrl = encodeURI(JSON.stringify(jsonObject));
+        var url = encodeURI(baseUrl + paramUrl);
+
+        console.log("Redirecting to: " + url);
+
+        window.location.href = url;
     },
 
     Refresh: function() {
@@ -22,24 +31,25 @@ mergeInto(LibraryManager.library, {
     },
 
     GetParams: function () {
-	var jsonString = "";
-		if (location.search != "") {
-			var search = location.search.substring(1);
-			if (search != "") {
-				var jsonObject = JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g,'":"') + '"}', function(key, value) { return key===""?value:decodeURIComponent(value) });
-				var jsonString = JSON.stringify(jsonObject);
-			}
-		}
-        console.log("Read parameters as json:" + jsonString);
+        var encodedUrl = decodeURI(window.location.toString());
+        var jsonString = "";
+        if (encodedUrl.indexOf('?') > -1) {
+            var decodedSearchUrl = decodeURI(decodeURI(encodedUrl).split('?')[1]);
 
+            console.log("Decoded search url = " + decodedSearchUrl);
+
+            var jsonObject = JSON.parse(decodedSearchUrl);
+            jsonString = JSON.stringify(jsonObject);
+
+            console.log("Read parameters as json: " + jsonString);
+        }
         var bufferSize = lengthBytesUTF8(jsonString) + 1;
         var buffer = _malloc(bufferSize);
         stringToUTF8(jsonString, buffer, bufferSize);
 
-        console.log("Parameter buffer:" + buffer);
+        console.log("Parameter buffer: " + buffer);
 
         return buffer;
-		
     },
 
     SetParams: function(str_paramsJson) {

@@ -10,10 +10,18 @@ namespace WebGLIntegration
     {
         private static void Redirect(string url)
         {
+            var preferences = JsonUtility.ToJson(PlatformPreferences.Current);
 #if UNITY_WEBGL && !UNITY_EDITOR
-            JSLib.Redirect(Config.BASE_URL + url + "/");
+            if (preferences != "{}") 
+            {
+                JSLib.RedirectWithParams(Config.BASE_URL + url + "/", preferences);
+            }
+            else 
+            {
+                JSLib.Redirect(Config.BASE_URL + url + "/");
+            }
 #endif
-            Debug.Log($"Should open {Config.BASE_URL + url + "/"} right now");
+            Debug.LogWarning($"Should open an encoded version of {Config.BASE_URL + url + "/?" + JsonUtility.ToJson(PlatformPreferences.Current)} now");
         }
 
         public static void OpenLauncher()
@@ -21,11 +29,9 @@ namespace WebGLIntegration
             Redirect(Config.LAUNCHER_URL);
         }
 
-        public static void Refresh()
+        public static void OpenGame(string gameUrl)
         {
-#if UNITY_WEBGL && !UNITY_EDITOR
-            JSLib.Refresh();
-#endif
+            Redirect(Config.GAME_BASE_URL + gameUrl);
         }
     }
 }
