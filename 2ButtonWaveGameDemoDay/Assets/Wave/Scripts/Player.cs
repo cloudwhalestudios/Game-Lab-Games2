@@ -31,6 +31,9 @@ public class Player : MonoBehaviour
     float hueValue;
     public bool isDead = false;
 
+    [SerializeField] KeyCode primaryKey;
+    [SerializeField] KeyCode secondaryKey;
+
     void Awake()
     {
         if (Instance == null)
@@ -57,10 +60,19 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         source = GetComponent<AudioSource>();
 
-
-
         hueValue = Random.Range(0, 10) / 10.0f;
         SetBackgroundColor();
+
+        if (PlatformPreferences.Current?.Keys != null)
+        {
+            primaryKey = PlatformPreferences.Current.Keys[0];
+            secondaryKey = PlatformPreferences.Current.Keys[1];
+        }
+        else if (primaryKey == KeyCode.None || secondaryKey == KeyCode.None)
+        {
+            primaryKey = KeyCode.LeftArrow;
+            secondaryKey = KeyCode.RightArrow;
+        }
     }
 
 
@@ -81,7 +93,7 @@ public class Player : MonoBehaviour
         angle += Time.deltaTime * Xspeed;
 
 
-        if (Input.GetKey(KeyCode.Keypad6) || Input.GetKeyDown(KeyCode.Joystick1Button0))
+        if (Input.GetKey(primaryKey) || Input.GetKeyDown(KeyCode.Joystick1Button0))
         {
             if (rb.velocity.y < YspeedMax)
             {

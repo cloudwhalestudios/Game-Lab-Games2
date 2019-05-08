@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using WebGLIntegration;
 
 public class BootLoader : MonoBehaviour
@@ -11,9 +9,10 @@ public class BootLoader : MonoBehaviour
     {
         if (!lookedForPlatformPreferences)
         {
-            /*var jsonString = WebGLParameters.GetParameterJson();
-            Debug.Log("Parameters in unity: " + jsonString);
-            */
+            var jsonString = WebGLParameters.GetParameterJson();
+            Debug.Log("Loaded parameters: " + JsonUtility.ToJson(jsonString, true));
+
+            PlatformPreferences.Current = JsonUtility.FromJson<PlatformPreferences>(jsonString);
         }
     }
 }

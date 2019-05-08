@@ -24,38 +24,51 @@ public class GameManager : MonoBehaviour
     public bool GameOverMenuRestartActive;
     public bool GameOverMenuMainMenuActive;
 
+    [SerializeField] KeyCode primaryKey;
+    [SerializeField] KeyCode secondaryKey;
+
     void Awake()
     {
-
-
         Application.targetFrameRate = 60;
-
 
         Time.timeScale = 1.0f;
 
-
         BestScoreTextTMPro.text = PlayerPrefs.GetInt("BestScore", 0).ToString();
         StartCoroutine(FadeIn());
-
     }
+
+    private void Start()
+    {
+        if (PlatformPreferences.Current?.Keys != null)
+        {
+            primaryKey = PlatformPreferences.Current.Keys[0];
+            secondaryKey = PlatformPreferences.Current.Keys[1];
+        }
+        else if (primaryKey == KeyCode.None || secondaryKey == KeyCode.None)
+        {
+            primaryKey = KeyCode.LeftArrow;
+            secondaryKey = KeyCode.RightArrow;
+        }
+    }
+
 
     void Update()
     {
         if (!Player.Instance.isDead)
         {
             if (touchToMoveTextObj.activeSelf == false) return;
-            if (Input.GetKeyDown(KeyCode.Keypad6) || Input.GetKeyDown(KeyCode.Joystick1Button0))
+            if (Input.GetKeyDown(primaryKey))
             {
                 touchToMoveTextObj.SetActive(false);
             }
         }
         else
         {
-            if (Input.GetKeyDown(KeyCode.Keypad6) || Input.GetKeyDown(KeyCode.Joystick1Button0))
+            if (Input.GetKeyDown(primaryKey))
             {
                 Restart();
             }
-            if (Input.GetKeyDown(KeyCode.Keypad4) || Input.GetKeyDown(KeyCode.Joystick1Button1))
+            if (Input.GetKeyDown(secondaryKey))
             {
                 SceneManager.LoadScene("MainMenuSceneWave");
             }
