@@ -6,7 +6,10 @@ public class CheckPointDetector : MonoBehaviour
 {
     public float CheckpointCycleTime;
 
-    public GameObject[] CurrentCheckpoints;
+    public List<GameObject> CurrentCheckpoints;
+    public GameObject CurrentNewCheckpoint;
+    public GameObject CurrentOldCheckpoint;
+    public CheckPoint OldCheckPointScript;
     public Vector2[] CurrentCheckpointsPositions;
     public CheckPoint[] Check;
 
@@ -23,25 +26,8 @@ public class CheckPointDetector : MonoBehaviour
         StartCoroutine(CycleCheckpoints());
     }
 
-    void FindCheckpoints()
-    {
-        CurrentCheckpoints = GameObject.FindGameObjectsWithTag("Checkpoint");
-        Check = new CheckPoint[CurrentCheckpoints.Length];
-        for (int i = 0; i < CurrentCheckpoints.Length; i++)
-        {
-            Check[i] = CurrentCheckpoints[i].GetComponent<CheckPoint>();
-        }
-    }
-
     void Update()
     {
-        FindCheckpoints();
-        
-        //Right Mouse Debugging
-        if (Input.GetMouseButtonDown(1))
-        {
-            
-        }
         if (CheckpointsAllCycled == true)
         {
             StartCoroutine(CycleCheckpoints());
@@ -54,12 +40,24 @@ public class CheckPointDetector : MonoBehaviour
         {
             CheckpointTriggerEnter = CheckpointTriggerEnter + 1;
             print(CheckpointTriggerEnter);
+
+            //add to list of current checkpoints
+            CurrentNewCheckpoint = other.gameObject;
+            CurrentCheckpoints.Add(CurrentNewCheckpoint);
+            Check = new CheckPoint[CurrentCheckpoints.Count];
+            for (int i = 0; i < CurrentCheckpoints.Count; i++)
+            {
+                Check[i] = CurrentCheckpoints[i].GetComponent<CheckPoint>();
+            }
+            
+
             //Here you have to log all checkpoints that enter player's collision box
             //Maybe list active collision checkpoints in trigger (not triggerEnter), then on trigger exit log them out.
         }
 
         if (other.gameObject.tag == "Player")
         {
+            //Add something like PlayerHasArrived = true;
             return;
         }
     }
@@ -68,18 +66,24 @@ public class CheckPointDetector : MonoBehaviour
     {
         if (other.gameObject.tag == "Checkpoint")
         {
-            //TheCheckPoint.selected = false;
+            // Debug number for detecting amount of checkpoints within hitbox
+            CheckpointTriggerEnter = CheckpointTriggerEnter - 1;
+            print(CheckpointTriggerEnter);
+
+            //Remove from list of current checkpoints
+            CurrentOldCheckpoint = other.gameObject;
+            OldCheckPointScript = CurrentOldCheckpoint.GetComponent<CheckPoint>();
+            OldCheckPointScript.selected = false;
+            CurrentCheckpoints.Remove(CurrentOldCheckpoint);
         }
     }
 
-    
     IEnumerator CycleCheckpoints()
     {
         CheckpointsAllCycled = false;
-        CurrentCheckpoints = GameObject.FindGameObjectsWithTag("Checkpoint");
-        Check = new CheckPoint[CurrentCheckpoints.Length];
-        CurrentCheckpointsPositions = new Vector2[CurrentCheckpoints.Length];
-        for (int i = 0; i < CurrentCheckpoints.Length; i++)
+        Check = new CheckPoint[CurrentCheckpoints.Count];
+        CurrentCheckpointsPositions = new Vector2[CurrentCheckpoints.Count];
+        for (int i = 0; i < CurrentCheckpoints.Count; i++)
         {
             DisableAllSelectedCheckpoints();
             Check[i] = CurrentCheckpoints[i].GetComponent<CheckPoint>();
@@ -95,9 +99,8 @@ public class CheckPointDetector : MonoBehaviour
 
     void DisableAllSelectedCheckpoints()
     {
-        CurrentCheckpoints = GameObject.FindGameObjectsWithTag("Checkpoint");
-        Check = new CheckPoint[CurrentCheckpoints.Length];
-        for (int i = 0; i < CurrentCheckpoints.Length; i++)
+        Check = new CheckPoint[CurrentCheckpoints.Count];
+        for (int i = 0; i < CurrentCheckpoints.Count; i++)
         {
             Check[i] = CurrentCheckpoints[i].GetComponent<CheckPoint>();
             Check[i].selected = false;
