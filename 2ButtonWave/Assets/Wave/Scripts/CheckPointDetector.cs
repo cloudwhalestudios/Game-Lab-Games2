@@ -17,18 +17,22 @@ public class CheckPointDetector : MonoBehaviour
     public float CurrentSelectedCheckpointPositionY;
 
     private bool CheckpointsAllCycled;
+    private bool SelectionIsFrozen;
 
     public float CheckpointTriggerEnter;
     public GameObject[] testArray;
 
+    private Player ThePlayer;
+
     void Start()
     {
+        ThePlayer = FindObjectOfType<Player>();
         StartCoroutine(CycleCheckpoints());
     }
 
     void Update()
     {
-        if (CheckpointsAllCycled == true)
+        if (CheckpointsAllCycled == true && !SelectionIsFrozen)
         {
             StartCoroutine(CycleCheckpoints());
         }
@@ -95,6 +99,18 @@ public class CheckPointDetector : MonoBehaviour
         }
         CheckpointsAllCycled = true;
         yield break;
+    }
+
+    public void FreezeCurrentSelection()
+    {
+        if (!ThePlayer.hasArrivedAtCheckpoint)
+        {
+            SelectionIsFrozen = true;
+            //Freeze the selection!!
+            CheckpointsAllCycled = false;
+            //Go to CurrentNewCheckpoint;  CurrentSelectedCheckpointPositionY;
+            // Use this when player has arrived: CheckpointsAllCycled = true; 
+        }
     }
 
     void DisableAllSelectedCheckpoints()
