@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
 
     [Space]
     public float Xspeed;
-    public float MoveToCheckpointSpeed;
+    public float transitionSpeed;
 
     public int YaccelerationForce;
     public int YdecelerationForce;
@@ -37,6 +37,9 @@ public class Player : MonoBehaviour
 
     private float CheckpointArrivalY;
 
+    private Coroutine activeMoveCoroutine;
+    private bool isMoving = false;
+
     void Awake()
     {
         if (Instance == null)
@@ -50,13 +53,15 @@ public class Player : MonoBehaviour
         }
     }
 
-        void Start()
+    void Start()
     {
         GameManagerObj = GameObject.Find("GameManager");
         rb = GetComponent<Rigidbody2D>();
         source = GetComponent<AudioSource>();
 
         TheCheckpointDetector = FindObjectOfType<CheckPointDetector>();
+
+        hasArrivedAtCheckpoint = true;
 
         hueValue = Random.Range(0, 10) / 10.0f;
         SetBackgroundColor();
@@ -67,36 +72,25 @@ public class Player : MonoBehaviour
     {
         if (isDead) return;
         MovePlayer();
-
-        print("Player has arrived at checkpoint = " + hasArrivedAtCheckpoint);
         CheckpointArrivalY = TheCheckpointDetector.CurrentSelectedCheckpointPositionY;
-        if (transform.position.y == CheckpointArrivalY)
-        {
-            hasArrivedAtCheckpoint = true;
-        } else
-        {
-            hasArrivedAtCheckpoint = false;
-        }
     }
 
 
     void MovePlayer()
     {
-        Vector2 pos = transform.position;
-        
-        pos.x = Mathf.Cos(angle) * (GameManagerObj.GetComponent<DisplayManager>().RIGHT * 0.9f);
-        //pos.y += 0.002f; This usually made the player move up slowly
-        //But we don't want there to be consequences when Jeroen does not move.
-        transform.position = pos;
-        angle += Time.deltaTime * Xspeed;
-        
-        if (Input.GetMouseButton(0))
+        if (!isMoving)
         {
-            //if (!hasArrivedAtCheckpoint && transform.position.y <= CheckpointArrivalY) { }
-            TheCheckpointDetector.FreezeCurrentSelection(); //FREEZE THE SELECTED CHECKPOINT UNTIL REACHED!
-            transform.position = Vector2.MoveTowards(transform.position, TheCheckpointDetector.CurrentSelectedCheckpointPosition, (MoveToCheckpointSpeed / 4));
+            Vector2 pos = transform.position;
+            pos.x = Mathf.Cos(angle) * (GameManagerObj.GetComponent<DisplayManager>().RIGHT * 0.9f);
+            transform.position = pos;
+            angle += Time.deltaTime * Xspeed;
         }
-        else
+
+        if (Input.GetMouseButton(0) && hasArrivedAtCheckpoint)
+        {
+            activeMoveCoroutine = StartCoroutine(MoveToCheckpoint());
+        }
+        else if (!isMoving)
         {
             if (rb.velocity.y > 0)
             {
@@ -108,6 +102,27 @@ public class Player : MonoBehaviour
             }
         }
 
+    }
+
+    IEnumerator MoveToCheckpoint()
+    {
+        hasArrivedAtCheckpoint = false;
+        isMoving = true;
+        print("Moving to Checkpoints");
+        TheCheckpointDetector.FreezeCurrentSelection();
+        var currentCheckpointPosition = new Vector3(TheCheckpointDetector.CurrentSelectedCheckpointPosition.x, TheCheckpointDetector.CurrentSelectedCheckpointPosition.y, transform.position.z);
+        var distanceCheckpoint = Vector3.Distance(currentCheckpointPosition, transform.position);
+        while (transform.position != currentCheckpointPosition)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, currentCheckpointPosition, transitionSpeed * Time.deltaTime); //(Time.deltaTime / transitionSpeed) * distanceCheckpoint)
+            yield return new WaitForEndOfFrame();
+        }
+        angle = Mathf.Acos(transform.position.x / (GameManagerObj.GetComponent<DisplayManager>().RIGHT * 0.9f));
+        hasArrivedAtCheckpoint = true;
+        isMoving = false;
+        print("Has arrived !!");
+        TheCheckpointDetector.UnfreezeCurrentSelection();
+        yield break;
     }
 
 

@@ -16,25 +16,28 @@ public class CheckPointDetector : MonoBehaviour
     public Vector2 CurrentSelectedCheckpointPosition;
     public float CurrentSelectedCheckpointPositionY;
 
-    private bool CheckpointsAllCycled;
-    private bool SelectionIsFrozen;
+    private bool CheckpointsAllCycled = true;
+    private bool SelectionIsFrozen = false;
 
     public float CheckpointTriggerEnter;
     public GameObject[] testArray;
 
     private Player ThePlayer;
 
+    private Coroutine activeCoroutine;
+
     void Start()
     {
         ThePlayer = FindObjectOfType<Player>();
-        StartCoroutine(CycleCheckpoints());
+        CheckpointsAllCycled = true;
+        SelectionIsFrozen = false;
     }
 
     void Update()
     {
-        if (CheckpointsAllCycled == true && !SelectionIsFrozen)
+        if (CheckpointsAllCycled && !SelectionIsFrozen)
         {
-            StartCoroutine(CycleCheckpoints());
+            activeCoroutine = StartCoroutine(CycleCheckpoints());
         }
     }
 
@@ -54,8 +57,6 @@ public class CheckPointDetector : MonoBehaviour
                 Check[i] = CurrentCheckpoints[i].GetComponent<CheckPoint>();
             }
             
-
-            //Here you have to log all checkpoints that enter player's collision box
             //Maybe list active collision checkpoints in trigger (not triggerEnter), then on trigger exit log them out.
         }
 
@@ -84,6 +85,7 @@ public class CheckPointDetector : MonoBehaviour
 
     IEnumerator CycleCheckpoints()
     {
+        print("Cycling Checkpoints");
         CheckpointsAllCycled = false;
         Check = new CheckPoint[CurrentCheckpoints.Count];
         CurrentCheckpointsPositions = new Vector2[CurrentCheckpoints.Count];
@@ -103,14 +105,18 @@ public class CheckPointDetector : MonoBehaviour
 
     public void FreezeCurrentSelection()
     {
-        if (!ThePlayer.hasArrivedAtCheckpoint)
+        if (!ThePlayer.hasArrivedAtCheckpoint && !SelectionIsFrozen)
         {
             SelectionIsFrozen = true;
-            //Freeze the selection!!
             CheckpointsAllCycled = false;
-            //Go to CurrentNewCheckpoint;  CurrentSelectedCheckpointPositionY;
-            // Use this when player has arrived: CheckpointsAllCycled = true; 
+            StopCoroutine(activeCoroutine);
         }
+    }
+
+    public void UnfreezeCurrentSelection()
+    {
+        SelectionIsFrozen = false;
+        CheckpointsAllCycled = true;
     }
 
     void DisableAllSelectedCheckpoints()
@@ -123,3 +129,18 @@ public class CheckPointDetector : MonoBehaviour
         }
     }
 }
+
+/*
+ * 
+ * - Checkpoints to prefabs (PLAYTEST)
+ * - Fix out of index error (Reproduce it) Had to do with the list/array.
+ * - Fix player always going left when arrived at checkpoint.
+ * - Add score when progressing upwards.
+ * 
+ * 
+ * OPTIONAL
+ * ~ Curve that maintains the x force ()
+ * ~ Instead of checkpoints use heightlines (5m, 10m etc.)
+ * ~ Change score system (E.g. white dots 10points and every 2m you travel you gain 1 points whatever
+ *
+ */
