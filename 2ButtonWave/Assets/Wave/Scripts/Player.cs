@@ -68,6 +68,7 @@ public class Player : MonoBehaviour
         if (isDead) return;
         MovePlayer();
 
+        print("Player has arrived at checkpoint = " + hasArrivedAtCheckpoint);
         CheckpointArrivalY = TheCheckpointDetector.CurrentSelectedCheckpointPositionY;
         if (transform.position.y == CheckpointArrivalY)
         {
@@ -91,14 +92,9 @@ public class Player : MonoBehaviour
         
         if (Input.GetMouseButton(0))
         {
-            // Click must happen once, then player moved automatically
-            // if (!hasArrivedAtCheckpoint && transform.position.y <= CheckpointArrivalY) { }
+            //if (!hasArrivedAtCheckpoint && transform.position.y <= CheckpointArrivalY) { }
+            TheCheckpointDetector.FreezeCurrentSelection(); //FREEZE THE SELECTED CHECKPOINT UNTIL REACHED!
             transform.position = Vector2.MoveTowards(transform.position, TheCheckpointDetector.CurrentSelectedCheckpointPosition, (MoveToCheckpointSpeed / 4));
-            /*   \/ Old player movement \/
-            if (rb.velocity.y < YspeedMax)
-            {
-                rb.AddForce(new Vector2(0, YaccelerationForce));
-            }*/
         }
         else
         {
