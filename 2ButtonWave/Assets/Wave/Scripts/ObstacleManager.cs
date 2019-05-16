@@ -40,7 +40,7 @@ public class ObstacleManager : MonoBehaviour
     {
         ObstacleCount = Obstacles.Length;
         int FirstObstacleNumber = Random.Range(0, ObstacleCount);
-        GameObject NewObs = Instantiate(Obstacles[0], new Vector3(0, ObstacleIndex * DistanceToNext), Quaternion.identity); // Change Obstacles[0] to Obstacles[FirstObstacleNumber]
+        GameObject NewObs = Instantiate(Obstacles[1], new Vector3(0, ObstacleIndex * DistanceToNext), Quaternion.identity); // Change Obstacles[0] to Obstacles[FirstObstacleNumber]
         NewObs.transform.SetParent(transform);
         ObstacleIndex++;
     }
